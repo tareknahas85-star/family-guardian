@@ -5,10 +5,12 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.tarek.guardian.BuildConfig
 import com.tarek.guardian.Prefs
+import com.tarek.guardian.R
 import com.tarek.guardian.alerts.AlertNotifier
 import com.tarek.guardian.alerts.ParentAlertService
 import com.tarek.guardian.data.Command
@@ -26,7 +28,7 @@ import java.util.Locale
  * The parent app's single host activity.
  *
  * The app used to be one long scrolling screen, which is why it "only showed one
- * page". Everything now lives in four tabs, following the SafeGuard navigation
+ * page". Everything now lives in four tabs, following the Family Guardian navigation
  * spec: Dashboard, Activity, Live, Settings. The Kids tab was folded into the
  * dashboard — it duplicated what was already there.
  *
@@ -201,12 +203,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun openPairingWindow() {
-        FirebaseRepo.openPairing(code)
-        Toast.makeText(
-            this,
-            "The child device can join for the next 15 minutes",
-            Toast.LENGTH_LONG
-        ).show()
+        Toast.makeText(this, getString(R.string.pair_opening), Toast.LENGTH_SHORT).show()
+        FirebaseRepo.openPairing(code) { ok, err ->
+            if (isFinishing) return@openPairing
+            val msg = if (ok) getString(R.string.pair_window_open, code)
+                      else getString(R.string.pair_window_failed, pairingErrorText(this, err))
+            AlertDialog.Builder(this)
+                .setTitle(if (ok) "✓" else "✗")
+                .setMessage(msg)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+        }
     }
 
     fun openNotificationSettings() {
@@ -222,7 +229,7 @@ class MainActivity : AppCompatActivity() {
                     .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, packageName)
             )
         } catch (_: Exception) {
-            Toast.makeText(this, "Open Settings > Apps > SafeGuard > Notifications",
+            Toast.makeText(this, "Open Settings > Apps > Family Guardian > Notifications",
                 Toast.LENGTH_LONG).show()
         }
     }

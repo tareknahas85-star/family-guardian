@@ -1,9 +1,12 @@
 package com.tarek.guardian.data
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseException
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
@@ -33,6 +36,11 @@ object FirebaseRepo {
 
     // ---------- Membership / pairing ----------
 
+    /** How long to wait for the server before calling a pairing step failed. */
+    private const val SERVER_TIMEOUT_MS = 20_000L
+
+    private val main = Handler(Looper.getMainLooper())
+
     /**
      * Adds this device's UID to the code's member list. Safe to call repeatedly.
      *
@@ -40,29 +48,91 @@ object FirebaseRepo {
      * sign-in completed used to fail silently and leave the app with no database
      * listeners at all, which looked exactly like "paired but nothing happens".
      */
-    fun claimDevice(code: String, onResult: ((Boolean) -> Unit)? = null) {
-        if (code.isBlank()) { onResult?.invoke(false); return }
+    fun claimDevice(code: String, onResult: ((Boolean) -> Unit)? = null) =
+        claimDeviceDetailed(code) { ok, _ -> onResult?.invoke(ok) }
+
+    /**
+     * Same as [claimDevice] but also reports *why* it failed, so the screen can
+     * say something more useful than "Pairing failed".
+     *
+     * Error values: [ERR_AUTH] (anonymous sign-in failed), [ERR_DENIED] (the
+     * rules refused — wrong code or pairing window closed), [ERR_TIMEOUT] (no
+     * answer from the server — offline, or wrong database URL), or the raw
+     * Firebase message for anything else.
+     */
+    fun claimDeviceDetailed(code: String, onResult: (ok: Boolean, error: String?) -> Unit) {
+        if (code.isBlank()) { onResult(false, "empty code"); return }
+        val once = Once(onResult)
         Auth.withUid(
             onFailed = { msg ->
                 Log.e(TAG, "claimDevice($code): no uid — $msg")
-                onResult?.invoke(false)
+                once(false, "$ERR_AUTH: $msg")
             }
         ) { u ->
+            // RTDB never fails a write while offline — it queues it and waits
+            // forever, so without this the screen sat on "Pairing…" for good.
+            main.postDelayed({ once(false, ERR_TIMEOUT) }, SERVER_TIMEOUT_MS)
             root(code).child("members").child(u).setValue(true)
-                .addOnSuccessListener { onResult?.invoke(true) }
+                .addOnSuccessListener { once(true, null) }
                 .addOnFailureListener { e ->
                     Log.e(TAG, "claimDevice failed for $code: ${e.message}")
-                    onResult?.invoke(false)
+                    once(false, describe(e))
                 }
         }
     }
 
-    /** Parent-side: lets a second device join for the next [PAIRING_WINDOW_MS]. */
-    fun openPairing(code: String) {
-        if (code.isBlank()) return
-        root(code).child("pairingOpenUntil")
-            .setValue(System.currentTimeMillis() + PAIRING_WINDOW_MS)
-            .addOnFailureListener { e -> Log.e(TAG, "openPairing failed: ${e.message}") }
+    /**
+     * Parent-side: lets a second device join for the next [PAIRING_WINDOW_MS].
+     *
+     * Three things used to make this fail silently while the parent's screen
+     * still said "the child can join now":
+     *  * it wrote before anonymous sign-in had finished (rejected: auth == null);
+     *  * it did not make sure the parent itself was a member first;
+     *  * the deadline came from the phone's own clock, but the rules compare it
+     *    with the *server's* clock — a phone running 15+ minutes slow opened a
+     *    window that was already closed.
+     * Now it signs in, claims, corrects for clock skew, and reports the result.
+     */
+    fun openPairing(code: String, onResult: ((ok: Boolean, error: String?) -> Unit)? = null) {
+        if (code.isBlank()) { onResult?.invoke(false, "empty code"); return }
+        claimDeviceDetailed(code) { claimed, err ->
+            if (!claimed) { onResult?.invoke(false, err); return@claimDeviceDetailed }
+            val once = Once<Boolean, String?> { ok, e -> onResult?.invoke(ok, e) }
+            main.postDelayed({ once(false, ERR_TIMEOUT) }, SERVER_TIMEOUT_MS)
+            // The documented way to read clock skew: a single-value listener on
+            // .info/serverTimeOffset, answered locally without a round-trip.
+            db.getReference(".info/serverTimeOffset")
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(s: DataSnapshot) = write(s.getValue(Long::class.java) ?: 0L)
+                    override fun onCancelled(e: DatabaseError) = write(0L)
+                    fun write(offset: Long) {
+                        val until = System.currentTimeMillis() + offset + PAIRING_WINDOW_MS
+                        root(code).child("pairingOpenUntil").setValue(until)
+                            .addOnSuccessListener { once(true, null) }
+                            .addOnFailureListener { e ->
+                                Log.e(TAG, "openPairing failed: ${e.message}")
+                                once(false, describe(e))
+                            }
+                    }
+                })
+        }
+    }
+
+    const val ERR_AUTH = "AUTH"
+    const val ERR_DENIED = "DENIED"
+    const val ERR_TIMEOUT = "TIMEOUT"
+
+    private fun describe(e: Exception): String {
+        val code = (e as? DatabaseException)?.message ?: e.message ?: "unknown"
+        return if (code.contains("permission", ignoreCase = true)) ERR_DENIED else code
+    }
+
+    /** Lets a callback fire only once, whichever of result/timeout comes first. */
+    private class Once<A, B>(private val f: (A, B) -> Unit) {
+        private var done = false
+        operator fun invoke(a: A, b: B) {
+            main.post { if (!done) { done = true; f(a, b) } }
+        }
     }
 
     fun closePairing(code: String) {

@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import com.tarek.guardian.R
 
 /**
- * The screen-time ring from the SafeGuard design: a thick rounded track with the
+ * The screen-time ring from the Family Guardian design: a thick rounded track with the
  * used portion drawn over it, starting at twelve o'clock.
  *
  * The colour follows how close the child is to the limit — indigo while there is

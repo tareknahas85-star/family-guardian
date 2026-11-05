@@ -16,4 +16,14 @@
     <string name="tab_activity">النشاط</string>
     <string name="tab_live">مباشر</string>
     <string name="tab_settings">الإعدادات</string>
+
+    <!-- رسائل الربط -->
+    <string name="pair_opening">عم نفتح نافذة الربط…</string>
+    <string name="pair_window_open">جهاز الولد فيه ينربط خلال الـ15 دقيقة الجاية.\n\nعلى موبايل الولد اكتب هالرمز بالضبط: %1$s</string>
+    <string name="pair_window_failed">ما قدرنا نفتح نافذة الربط.\n\n%1$s</string>
+    <string name="pair_in_progress">عم نربط…</string>
+    <string name="pair_failed_child">ما زبط الربط.\n\n%1$s</string>
+    <string name="pair_err_denied">السيرفر رفض. يا إما الرمز غلط، يا إما نافذة الربط مسكّرة. على موبايل الأهل اضغط \"فتح نافذة الربط\" وجرّب خلال 15 دقيقة بنفس الرمز اللي طالع هنيك.</string>
+    <string name="pair_err_timeout">ما في رد من السيرفر. تأكد من النت عهالموبايل. إذا النت شغّال، فإعدادات Firebase (google-services.json) غالباً عم تأشّر على قاعدة بيانات غلط.</string>
+    <string name="pair_err_auth">فشل تسجيل الدخول بـ Firebase. لازم يكون Anonymous مفعّل بـ Firebase Console (Authentication ← Sign-in method ← Anonymous).</string>
 </resources>

@@ -53,15 +53,17 @@ class ChildSetupActivity : AppCompatActivity() {
                 b.tvStatus.text = "Invalid code"
                 return@setOnClickListener
             }
-            b.tvStatus.text = "Pairing…"
+            b.tvStatus.text = getString(R.string.pair_in_progress)
+            b.btnPair.isEnabled = false
             // Join the code first; without membership every later write is rejected
             // by the database rules. The parent must have opened a pairing window.
-            FirebaseRepo.claimDevice(code) { ok ->
+            FirebaseRepo.claimDeviceDetailed(code) { ok, err ->
                 runOnUiThread {
+                    b.btnPair.isEnabled = true
                     if (!ok) {
-                        b.tvStatus.text =
-                            "Pairing failed.\n" +
-                                "Ask the parent to tap \"Open pairing window\", then retry."
+                        b.tvStatus.text = getString(
+                            R.string.pair_failed_child, pairingErrorText(this, err)
+                        )
                         return@runOnUiThread
                     }
                     Prefs.setPairCode(this, code)
@@ -293,7 +295,7 @@ class ChildSetupActivity : AppCompatActivity() {
         } catch (_: Exception) {
             Toast.makeText(
                 this,
-                "Open Settings → Battery → find SafeGuard → allow background activity / autostart",
+                "Open Settings → Battery → find Family Guardian → allow background activity / autostart",
                 Toast.LENGTH_LONG
             ).show()
         }
