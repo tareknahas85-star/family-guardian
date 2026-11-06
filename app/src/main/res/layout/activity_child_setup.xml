@@ -37,7 +37,7 @@
                     android:textColor="@color/primary" />
                 <TextView android:id="@+id/tvVersion" android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:textSize="11sp"
-                    android:textColor="@color/on_surface_variant" android:text="Child device" />
+                    android:textColor="@color/on_surface_variant" android:text="@string/child_device" />
             </LinearLayout>
         </LinearLayout>
 
@@ -47,7 +47,7 @@
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="vertical" android:padding="18dp">
                 <TextView style="@style/Text.SectionLabel" android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:text="Pairing" />
+                    android:layout_height="wrap_content" android:text="@string/pairing" />
                 <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:text="@string/child_notice" style="@style/Text.Body"
                     android:paddingTop="6dp" android:paddingBottom="12dp" />
@@ -61,10 +61,37 @@
                 </com.google.android.material.textfield.TextInputLayout>
                 <Button android:id="@+id/btnPair" style="@style/Button.Primary"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="Pair device" android:layout_marginTop="12dp" />
+                    android:text="@string/pair_device" android:layout_marginTop="12dp" />
                 <TextView android:id="@+id/tvStatus" style="@style/Text.Caption"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:paddingTop="10dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ══ Extra time & tasks — the child asks, the parent decides ══ -->
+        <androidx.cardview.widget.CardView android:id="@+id/cardRequests" style="@style/Card.Guardian"
+            android:layout_width="match_parent" android:layout_height="wrap_content">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="18dp">
+                <TextView style="@style/Text.SectionLabel" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="@string/child_time_title" />
+                <TextView android:id="@+id/tvTimeLeft" style="@style/Text.Body"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:paddingTop="6dp" />
+                <Button android:id="@+id/btnAskTime" style="@style/Button.Primary"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="@string/ask_more_time" android:layout_marginTop="10dp" />
+                <TextView android:id="@+id/tvRequestStatus" style="@style/Text.Caption"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:paddingTop="8dp" />
+                <TextView style="@style/Text.SectionLabel" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="@string/my_tasks"
+                    android:paddingTop="16dp" />
+                <LinearLayout android:id="@+id/tasksHost" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="vertical" />
+                <TextView android:id="@+id/tvNoTasks" style="@style/Text.Caption"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:paddingTop="6dp" android:text="@string/no_tasks_child" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -74,7 +101,7 @@
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="vertical" android:padding="18dp">
                 <TextView style="@style/Text.SectionLabel" android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:text="Remote control status" />
+                    android:layout_height="wrap_content" android:text="@string/remote_status" />
                 <TextView android:id="@+id/tvAdminStatus" android:layout_width="match_parent"
                     android:layout_height="wrap_content" android:textSize="15sp"
                     android:textStyle="bold" android:paddingTop="10dp" />
@@ -96,36 +123,36 @@
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="vertical" android:padding="18dp">
                 <TextView style="@style/Text.SectionLabel" android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:text="Permission steps" />
+                    android:layout_height="wrap_content" android:text="@string/permission_steps" />
 
                 <Button android:id="@+id/btnPermUsage" style="@style/Button.Outline"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="1) Usage access" android:layout_marginTop="10dp" />
+                    android:text="@string/step_usage" android:layout_marginTop="10dp" />
                 <Button android:id="@+id/btnPermAccessibility" style="@style/Button.Outline"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="2) Accessibility service (app blocking)" android:layout_marginTop="10dp" />
+                    android:text="@string/step_accessibility" android:layout_marginTop="10dp" />
                 <Button android:id="@+id/btnPermOverlay" style="@style/Button.Outline"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="3) Display over other apps" android:layout_marginTop="10dp" />
+                    android:text="@string/step_overlay" android:layout_marginTop="10dp" />
                 <Button android:id="@+id/btnPermLocation" style="@style/Button.Outline"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="4) Location + calls + contacts + notifications" android:layout_marginTop="10dp" />
+                    android:text="@string/step_runtime" android:layout_marginTop="10dp" />
                 <Button android:id="@+id/btnPermAdmin" style="@style/Button.Outline"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="5) Enable device admin" android:layout_marginTop="10dp" />
+                    android:text="@string/step_admin" android:layout_marginTop="10dp" />
                 <Button android:id="@+id/btnStartVpn" style="@style/Button.Outline"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="6) Start the internet filter" android:layout_marginTop="10dp" />
+                    android:text="@string/step_vpn" android:layout_marginTop="10dp" />
                 <Button android:id="@+id/btnPermCallScreening" style="@style/Button.Outline"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="7) Call filtering permission" android:layout_marginTop="10dp" />
+                    android:text="@string/step_calls" android:layout_marginTop="10dp" />
                 <Button android:id="@+id/btnAutostart" style="@style/Button.Outline"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="8) Allow background activity (important on Huawei/Xiaomi/Oppo/Vivo)"
+                    android:text="@string/step_autostart"
                     android:layout_marginTop="10dp" />
                 <TextView style="@style/Text.Caption" android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Some phone brands freeze this app's connection in the background even when everything above is set up correctly — remote lock and internet blocking then silently stop working. This step fixes that."
+                    android:text="@string/step_autostart_hint"
                     android:paddingTop="6dp" />
                 <TextView android:id="@+id/tvCallScreeningStatus" style="@style/Text.Caption"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -140,10 +167,10 @@
                 android:orientation="vertical" android:padding="18dp">
                 <Button android:id="@+id/btnSos" style="@style/Button.Sos"
                     android:layout_width="match_parent" android:layout_height="72dp"
-                    android:text="🆘  SOS" />
+                    android:text="@string/sos_button" />
                 <TextView style="@style/Text.Caption" android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Sends your location and an instant alert to your parent"
+                    android:text="@string/sos_button_hint"
                     android:paddingTop="8dp" android:gravity="center" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>

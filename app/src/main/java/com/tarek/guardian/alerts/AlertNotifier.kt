@@ -1,5 +1,6 @@
 package com.tarek.guardian.alerts
 
+import com.tarek.guardian.L10n
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -43,7 +44,7 @@ object AlertNotifier {
 
         val b = NotificationCompat.Builder(ctx, App.CH_ALERTS)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(alert.title.ifBlank { "Alert" })
+            .setContentTitle(alert.title.ifBlank { L10n.s(R.string.alert_generic) })
             .setContentText(alert.body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(alert.body))
             .setWhen(alert.ts)
@@ -74,7 +75,7 @@ object AlertNotifier {
         val pi = PendingIntent.getActivity(
             ctx, id, map, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-        b.addAction(0, "Map", pi).setContentIntent(pi)
+        b.addAction(0, L10n.s(R.string.action_map), pi).setContentIntent(pi)
     }
 
     private fun addCallerActions(ctx: Context, b: NotificationCompat.Builder, a: Alert, id: Int) {
@@ -86,7 +87,7 @@ object AlertNotifier {
             ctx, id * 2, lookup,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-        b.addAction(0, "Who is this?", lookupPi)
+        b.addAction(0, L10n.s(R.string.action_who), lookupPi)
 
         // Call the number back yourself.
         val dial = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${a.number}"))
@@ -94,7 +95,7 @@ object AlertNotifier {
             ctx, id * 2 + 1, dial,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-        b.addAction(0, "Call", dialPi)
+        b.addAction(0, L10n.s(R.string.action_call), dialPi)
     }
 
     /**

@@ -1,7 +1,10 @@
 package com.tarek.guardian.ui
 
+import com.tarek.guardian.L10n
 import com.tarek.guardian.data.ActivityEvent
 import com.tarek.guardian.data.Alert
+import com.tarek.guardian.data.ChildRequest
+import com.tarek.guardian.data.LocPoint
 import com.tarek.guardian.data.Policy
 
 /**
@@ -50,7 +53,11 @@ object GuardianState {
         /** package name -> label, as reported by the child device. */
         val installedApps: Map<String, String> = emptyMap(),
         /** Set when the database could not be reached, for display. */
-        val error: String? = null
+        val error: String? = null,
+        /** Recent requests from the child (extra time, task rewards). */
+        val requests: List<ChildRequest> = emptyList(),
+        /** Today's movement track, oldest first. */
+        val track: List<LocPoint> = emptyList()
     ) {
         val isOnline: Boolean
             get() = lastSeen > 0L && System.currentTimeMillis() - lastSeen < 4 * 60_000L
@@ -90,21 +97,8 @@ object GuardianState {
 
     // ── Formatting helpers used by more than one tab ───────────────────────────
 
-    fun formatDuration(minutes: Int): String {
-        val h = minutes / 60
-        val m = minutes % 60
-        return if (h > 0) "${h}h ${m}m" else "${m}m"
-    }
+    fun formatDuration(minutes: Int): String = L10n.duration(minutes)
 
     /** How long ago, in words. */
-    fun relativeTime(ts: Long): String {
-        if (ts == 0L) return "—"
-        val min = (System.currentTimeMillis() - ts) / 60_000
-        return when {
-            min < 1    -> "just now"
-            min < 60   -> "$min min ago"
-            min < 1440 -> "${min / 60} h ago"
-            else       -> "${min / 1440} d ago"
-        }
-    }
+    fun relativeTime(ts: Long): String = L10n.ago(ts)
 }

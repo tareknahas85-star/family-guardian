@@ -1,5 +1,7 @@
 package com.tarek.guardian.calls
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 /**
  * Phone-number comparison helpers.
  *
@@ -48,5 +50,7 @@ object NumberUtils {
 
     /** Pretty form for notifications: keeps the original if it already looks formatted. */
     fun display(raw: String?): String =
-        if (raw.isNullOrBlank()) "Withheld" else raw
+        if (raw.isNullOrBlank()) L10n.s(R.string.withheld)
+        // Isolated left-to-right so "+963 ..." never gets scrambled inside Arabic text.
+        else "\u2066$raw\u2069"
 }

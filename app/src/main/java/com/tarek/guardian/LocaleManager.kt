@@ -6,10 +6,10 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 
 /**
- * English, always — the parent asked for the app to stop mixing languages, so
- * there is no Arabic string resource set to switch to. [SYSTEM] and [EN] end up
- * looking identical today, but the setting is kept so a future translation can
- * slot back in without another settings-screen change.
+ * Per-app language: English, Arabic, or follow the phone. Every screen and
+ * message reads from string resources (values/ and values-ar/), so switching
+ * flips the whole app, layout direction included (right-to-left for Arabic).
+ *
  *
  * Uses AppCompat's per-app locale API rather than swapping `Configuration`
  * by hand. On Android 13+ AppCompat hands the choice to the platform, so it

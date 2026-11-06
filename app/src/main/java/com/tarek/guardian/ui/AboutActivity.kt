@@ -46,14 +46,14 @@ class AboutActivity : AppCompatActivity() {
         // The app theme is *.NoActionBar, so the layout supplies its own toolbar.
         setSupportActionBar(b.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "About"
+        supportActionBar?.title = getString(R.string.about)
         b.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         // ── User info from Firebase Auth ──────────────────────────────────────
         val user = FirebaseAuth.getInstance().currentUser
-        b.tvDisplayName.text = user?.displayName?.takeIf { it.isNotBlank() } ?: "Parent"
+        b.tvDisplayName.text = user?.displayName?.takeIf { it.isNotBlank() } ?: getString(R.string.parent)
         val email = user?.email?.takeIf { it.isNotBlank() }
-        b.tvRole.text = if (email != null) "$email — Parent" else "Tarek Nahas — Parent"
+        b.tvRole.text = getString(R.string.role_parent_suffix, email ?: "Tarek Nahas")
 
         // ── App version ───────────────────────────────────────────────────────
         b.tvVersion.text = "v${BuildConfig.VERSION_NAME}"
@@ -80,13 +80,13 @@ class AboutActivity : AppCompatActivity() {
         // ── Save the drawn signature ──────────────────────────────────────────
         b.btnSaveSignature.setOnClickListener {
             if (b.signaturePad.isEmpty) {
-                toast("Please draw your signature first")
+                toast(getString(R.string.draw_signature_first))
                 return@setOnClickListener
             }
             val bmp = b.signaturePad.transparentSignatureBitmap
             saveSignature(this, bitmapToBase64(bmp))
             showPreview(bmp)
-            toast("Signature saved ✓")
+            toast(getString(R.string.signature_saved))
         }
 
         // ── Clear: drop the custom signature, restore the bundled default ─────
@@ -94,7 +94,7 @@ class AboutActivity : AppCompatActivity() {
             clearSignature(this)
             b.signaturePad.clear()
             showDefaultSignature()
-            toast("Default signature restored")
+            toast(getString(R.string.signature_restored))
         }
 
         // ── Contact rows ──────────────────────────────────────────────────────
@@ -145,7 +145,7 @@ class AboutActivity : AppCompatActivity() {
         try {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         } catch (e: ActivityNotFoundException) {
-            toast("No app can open this link")
+            toast(getString(R.string.no_app_for_link))
         }
     }
 

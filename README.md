@@ -42,6 +42,24 @@ It works, but it is a personal project. It is not on Google Play. You build the
 APK yourself, or download it from the
 [latest release](https://github.com/tareknahas85-star/family-guardian/releases/tag/latest).
 
+### What's new in 10.0
+
+- **Full Arabic.** Every screen, notification and message in Levantine Arabic,
+  right-to-left. Settings → Language switches the whole app.
+- **Ask for more time.** When time runs out the child taps once to ask; the parent
+  approves or denies straight from the notification. Approved minutes count for
+  that day only.
+- **Rewards.** The parent adds tasks (homework, tidy room…) worth minutes. The
+  child taps "I did it", the parent confirms, the time is added.
+- **Safe browsing.** One switch routes the child's DNS through the free
+  CleanBrowsing family filter: adult and gambling sites blocked, SafeSearch and
+  YouTube Restricted Mode forced.
+- **Tamper alerts.** The parent is told at once when device admin, the VPN or
+  app blocking is switched off on the child's phone.
+- **Two parents.** The second parent's phone joins the same family with the code.
+- **Today's places.** The day's movement as a list of stops with times, plus the
+  route on the map.
+
 ### How it works
 
 Both phones talk to **your own** Firebase Realtime Database. Nothing goes to any
@@ -176,6 +194,21 @@ GitHub Actions builds the APK on every push.
 
 شغّال، بس هو مشروع شخصي. مو عـ Google Play. إما بتبني ملف APK بإيدك، أو بتنزّلو من
 [صفحة آخر إصدار](https://github.com/tareknahas85-star/family-guardian/releases/tag/latest).
+
+### شو الجديد بـ 10.0
+
+- **عربي كامل.** كل شاشة وإشعار ورسالة بالشامي، ومن اليمين لليسار. من الإعدادات
+  ← اللغة بتقلب التطبيق كله.
+- **طلب وقت زيادة.** لما يخلص الوقت، الولد بيطلب بكبسة، والأهل بيوافقوا أو بيرفضوا
+  من الإشعار نفسه. الدقايق اللي بتنعطى بتنحسب لهداك اليوم بس.
+- **المكافآت.** الأهل بيضيفوا مهمات (الوظيفة، ترتيب الغرفة…) وكل وحدة إلها دقايق.
+  الولد بيكبس "خلّصتها"، الأهل بيأكدوا، والوقت بينضاف.
+- **التصفح الآمن.** زر واحد بيمرّق الـ DNS تبع الولد من فلتر العيلة المجاني من
+  CleanBrowsing: مواقع الكبار والقمار محجوبة، والبحث الآمن ووضع YouTube المقيّد مفروضين.
+- **تنبيهات التلاعب.** الأهل بيعرفوا فوراً إذا انطفى مسؤول الجهاز أو الـ VPN أو حجب
+  التطبيقات على موبايل الولد.
+- **أب وأم سوا.** موبايل الطرف التاني بينضم لنفس العيلة بالرمز.
+- **أماكن اليوم.** تحركات اليوم كقائمة أماكن مع الأوقات، والطريق عالخريطة.
 
 ### كيف بيشتغل
 

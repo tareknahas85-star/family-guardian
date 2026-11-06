@@ -1,5 +1,6 @@
 package com.tarek.guardian.monitor
 
+import com.tarek.guardian.L10n
 import android.app.ActivityManager
 import android.app.Notification
 import android.app.PendingIntent
@@ -54,6 +55,7 @@ class MonitorService : Service() {
     private var lastInternetOff: Boolean? = null
     private var lastOverBudget = false
     private var wasPinned = false
+    private var lastOverLimit: Set<String> = emptySet()
 
     @Volatile
     private var policy: Policy = Policy()
@@ -151,14 +153,18 @@ class MonitorService : Service() {
         reportLocationAndFences()
 
         val batt = DeviceInfo.battery(this)
+        val adminOk = policyMgr.isAdminActive
+        val vpnOk = VpnService.prepare(this) == null
+        val accOk = AppBlockService.isEnabled(this)
+        checkTamper(adminOk, vpnOk, accOk)
         // LOCK_NOW and BLOCK_INTERNET are no-ops without these two one-time OS
         // grants — report the real state every cycle so the parent can see it
         // instead of a command silently doing nothing (see handleCommand()).
         FirebaseRepo.setChildInfo(
             code, "${Build.MANUFACTURER} ${Build.MODEL}", batt.percent, batt.charging,
-            adminActive = policyMgr.isAdminActive,
-            vpnReady = VpnService.prepare(this) == null,
-            accessibilityActive = AppBlockService.isEnabled(this)
+            adminActive = adminOk,
+            vpnReady = vpnOk,
+            accessibilityActive = accOk
         )
 
         // The installed list barely changes; once an hour is plenty and keeps the
@@ -172,6 +178,7 @@ class MonitorService : Service() {
         if (now - lastEventTrim > EVENT_TRIM_INTERVAL_MS) {
             lastEventTrim = now
             FirebaseRepo.trimEvents(code)
+            FirebaseRepo.trimTrack(code)
         }
     }
 
@@ -189,12 +196,13 @@ class MonitorService : Service() {
             if (parts.size == 2) {
                 val pkg = parts[0]
                 val limit = parts[1].toIntOrNull() ?: return@forEach
-                if ((usage[pkg] ?: 0) >= limit) overLimit.add(pkg)
+                if ((usage[pkg] ?: 0) >= limit + bonusToday()) overLimit.add(pkg)
             }
         }
 
         // Whole-device daily budget. "*" tells AppBlockService to bounce every app.
-        val dailyBudget = policy.dailyLimitMinutes
+        // Extra minutes the parent approved today stretch the budget for today only.
+        val dailyBudget = if (policy.dailyLimitMinutes > 0) policy.dailyLimitMinutes + bonusToday() else 0
         val totalToday = usage.filterKeys { it != packageName }.values.sum()
         val overDailyBudget = dailyBudget > 0 && totalToday >= dailyBudget
 
@@ -228,7 +236,7 @@ class MonitorService : Service() {
                 )
                 EventReporter.record(
                     this, ActivityEvent.INTERNET,
-                    "Internet timer ended", "Auto re-blocked"
+                    L10n.s(R.string.net_timer_ended), L10n.s(R.string.net_auto_reblocked)
                 )
             } else {
                 effectiveBlocked = false
@@ -243,7 +251,7 @@ class MonitorService : Service() {
             FilterVpnService.confirmStillBlocked()
             FilterVpnService.block(this)
         } else {
-            FilterVpnService.unblock(this)
+            openInternet()
         }
 
         // Only report the change, not the state, or the feed fills with one row a
@@ -252,14 +260,18 @@ class MonitorService : Service() {
             lastInternetOff = internetOff
             EventReporter.record(
                 this, ActivityEvent.INTERNET,
-                if (internetOff) "Internet paused" else "Internet resumed"
+                L10n.s(if (internetOff) R.string.internet_paused else R.string.internet_resumed)
             )
         }
+        if ((overDailyBudget && !lastOverBudget) || overLimit.any { it !in lastOverLimit }) {
+            notifyTimeUp()
+        }
+        lastOverLimit = overLimit
         if (overDailyBudget && !lastOverBudget) {
             EventReporter.record(
                 this, ActivityEvent.LIMIT_REACHED,
-                "Daily screen time used up",
-                "Budget was ${dailyBudget} min"
+                L10n.s(R.string.limit_used_up),
+                L10n.s(R.string.limit_budget_was, dailyBudget)
             )
         }
         lastOverBudget = overDailyBudget
@@ -287,17 +299,33 @@ class MonitorService : Service() {
             policyMgr.lockNow()
             val pkg = AppBlockService.lastForegroundPkg
             val body = if (!pkg.isNullOrBlank()) {
-                "Tried to pin \"${EventReporter.appLabel(this, pkg)}\" open. The screen was locked automatically."
+                L10n.s(R.string.pin_with_app, EventReporter.appLabel(this, pkg))
             } else {
-                "Screen pinning was detected. The screen was locked automatically."
+                L10n.s(R.string.pin_generic)
             }
             FirebaseRepo.pushAlert(
                 code,
-                Alert(type = Alert.PIN_ATTEMPT, title = "Tried to pin an app", body = body, ts = System.currentTimeMillis())
+                Alert(type = Alert.PIN_ATTEMPT, title = L10n.s(R.string.ev_pin), body = body, ts = System.currentTimeMillis())
             )
-            EventReporter.record(this, ActivityEvent.PIN_ATTEMPT, "Tried to pin an app", body, pkg ?: "")
+            EventReporter.record(this, ActivityEvent.PIN_ATTEMPT, L10n.s(R.string.ev_pin), body, pkg ?: "")
         }
         wasPinned = pinned
+    }
+
+    private var lastTrack: android.location.Location? = null
+
+    /**
+     * Today's movement timeline. A point is stored when the child has moved
+     * more than [TRACK_MIN_MOVE_M] or [TRACK_MAX_GAP_MS] has passed, so a
+     * child sitting at school all day costs a handful of rows, not 480.
+     */
+    private fun recordTrackPoint(loc: android.location.Location) {
+        val prev = lastTrack
+        val moved = prev == null || prev.distanceTo(loc) > TRACK_MIN_MOVE_M
+        val stale = prev == null || loc.time - prev.time > TRACK_MAX_GAP_MS
+        if (!moved && !stale) return
+        lastTrack = loc
+        FirebaseRepo.reportLocationPoint(code, loc.latitude, loc.longitude)
     }
 
     /** One location fix, used both for the parent's map and the safe zones. */
@@ -316,6 +344,7 @@ class MonitorService : Service() {
                 .addOnSuccessListener { loc ->
                     if (loc == null) return@addOnSuccessListener
                     FirebaseRepo.reportLocation(code, loc.latitude, loc.longitude)
+                    recordTrackPoint(loc)
                     geofences.evaluate(code, policy.zones, loc)
                 }
         } catch (_: SecurityException) {
@@ -333,7 +362,7 @@ class MonitorService : Service() {
             FilterVpnService.confirmStillBlocked()
             FilterVpnService.block(this)
         } else {
-            FilterVpnService.unblock(this)
+            openInternet()
         }
 
         // Mirror the call rules locally — the screening service is started cold
@@ -358,9 +387,8 @@ class MonitorService : Service() {
             "LOCK_NOW" -> {
                 if (!policyMgr.isAdminActive) {
                     reportSetupNeeded(
-                        "Couldn't lock the phone",
-                        "Device Admin isn't active on the child's phone. Open Family " +
-                            "Guardian there → Setup → \"Enable Device Admin\"."
+                        L10n.s(R.string.cant_lock_title),
+                        L10n.s(R.string.cant_lock_body)
                     )
                 } else {
                     policyMgr.lockNow()
@@ -371,9 +399,8 @@ class MonitorService : Service() {
             "BLOCK_INTERNET" -> {
                 if (VpnService.prepare(this) != null) {
                     reportSetupNeeded(
-                        "Couldn't turn off internet",
-                        "VPN permission isn't granted on the child's phone. Open Family " +
-                            "Guardian there → Setup → \"Start VPN\" and accept the prompt."
+                        L10n.s(R.string.cant_net_title),
+                        L10n.s(R.string.cant_net_body)
                     )
                 } else {
                     FilterVpnService.confirmStillBlocked()
@@ -386,8 +413,8 @@ class MonitorService : Service() {
                 }
             }
             "ALLOW_INTERNET" -> {
-                // Tear the tunnel down for real, not just flip a flag.
-                FilterVpnService.unblock(this)
+                // Tear the block down for real, not just flip a flag.
+                openInternet()
                 FirebaseRepo.updatePolicy(
                     code, mapOf("internetBlocked" to false, "internetTimerUntil" to 0L)
                 )
@@ -406,6 +433,66 @@ class MonitorService : Service() {
      * "Lock sent" / "Internet paused" toast on their own phone and nothing ever
      * happened on the child's, with no way to tell why.
      */
+    /**
+     * Tells the child their time is up and offers the way out that does not
+     * involve arguing: one tap opens the "ask for more time" dialog.
+     */
+    private fun notifyTimeUp() {
+        val open = Intent(this, com.tarek.guardian.ui.ChildSetupActivity::class.java)
+            .putExtra(com.tarek.guardian.ui.ChildRequestsPanel.EXTRA_ASK_TIME, true)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        val pi = PendingIntent.getActivity(
+            this, 7, open, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val n = NotificationCompat.Builder(this, App.CH_ALERTS)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(L10n.s(R.string.time_up_title))
+            .setContentText(L10n.s(R.string.time_up_body))
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+            .addAction(0, L10n.s(R.string.ask_more_time), pi)
+            .build()
+        try {
+            androidx.core.app.NotificationManagerCompat.from(this).notify(TIME_UP_NOTIF, n)
+        } catch (_: SecurityException) {
+        }
+    }
+
+    /** Approved extra minutes, counted only on the day they were granted. */
+    private fun bonusToday(): Int {
+        val today = SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
+        return if (policy.bonusDate == today) policy.bonusMinutes.coerceAtLeast(0) else 0
+    }
+
+    /**
+     * "Internet on" has two shapes: completely open, or open through the family
+     * DNS filter when the parent turned safe browsing on.
+     */
+    private fun openInternet() {
+        if (policy.filterWeb) FilterVpnService.filter(this) else FilterVpnService.unblock(this)
+    }
+
+    /**
+     * Tamper alerts. Each protection is compared with what it was on the last
+     * cycle; the moment one goes from on to off the parent hears about it, once,
+     * instead of discovering days later that nothing has been enforced.
+     */
+    private fun checkTamper(admin: Boolean, vpn: Boolean, acc: Boolean) {
+        val sp = getSharedPreferences("tamper", MODE_PRIVATE)
+        val lost = ArrayList<String>()
+        if (sp.getBoolean("admin", false) && !admin) lost.add(L10n.s(R.string.tamper_admin))
+        if (sp.getBoolean("vpn", false) && !vpn) lost.add(L10n.s(R.string.tamper_vpn))
+        if (sp.getBoolean("acc", false) && !acc) lost.add(L10n.s(R.string.tamper_acc))
+        sp.edit().putBoolean("admin", admin).putBoolean("vpn", vpn).putBoolean("acc", acc).apply()
+        if (lost.isEmpty()) return
+        val body = L10n.s(R.string.tamper_body, lost.joinToString("\n• ", prefix = "• "))
+        FirebaseRepo.pushAlert(
+            code,
+            Alert(type = Alert.TAMPER, title = L10n.s(R.string.tamper_title), body = body, ts = System.currentTimeMillis())
+        )
+        EventReporter.record(this, ActivityEvent.TAMPER, L10n.s(R.string.tamper_title), lost.joinToString(", "))
+    }
+
     private fun reportSetupNeeded(title: String, body: String) {
         FirebaseRepo.pushAlert(
             code,
@@ -419,8 +506,8 @@ class MonitorService : Service() {
             PendingIntent.FLAG_IMMUTABLE
         )
         return NotificationCompat.Builder(this, App.CH_MONITOR)
-            .setContentTitle("Family Guardian")
-            .setContentText("Supervised device")
+            .setContentTitle(L10n.s(R.string.app_name))
+            .setContentText(L10n.s(R.string.notif_supervised))
             .setSmallIcon(R.drawable.ic_notification)
             .setOngoing(true)
             .setContentIntent(pi)
@@ -442,6 +529,9 @@ class MonitorService : Service() {
         private const val TAG = "MonitorService"
         private const val APP_LIST_INTERVAL_MS = 60 * 60 * 1000L
         private const val EVENT_TRIM_INTERVAL_MS = 6 * 60 * 60 * 1000L
+        private const val TRACK_MIN_MOVE_M = 150f
+        private const val TIME_UP_NOTIF = 4107
+        private const val TRACK_MAX_GAP_MS = 30 * 60 * 1000L
         const val ACTION_SOS = "com.tarek.guardian.SOS"
 
         fun start(ctx: Context) {

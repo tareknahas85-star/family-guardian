@@ -30,6 +30,7 @@ import com.tarek.guardian.vpn.FilterVpnService
 class ChildSetupActivity : AppCompatActivity() {
     private lateinit var b: ActivityChildSetupBinding
     private lateinit var policyMgr: PolicyManager
+    private lateinit var requestsPanel: ChildRequestsPanel
 
     private val vpnLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -43,14 +44,20 @@ class ChildSetupActivity : AppCompatActivity() {
         setContentView(b.root)
         policyMgr = PolicyManager(this)
 
-        b.tvVersion.text = "v${BuildConfig.VERSION_NAME} — Child device"
+        b.tvVersion.text = getString(R.string.child_version, BuildConfig.VERSION_NAME)
 
         Prefs.getPairCode(this)?.let { b.etPairCode.setText(it) }
+
+        requestsPanel = ChildRequestsPanel(this, b)
+        requestsPanel.start()
+        if (intent?.getBooleanExtra(ChildRequestsPanel.EXTRA_ASK_TIME, false) == true) {
+            requestsPanel.askForTime()
+        }
 
         b.btnPair.setOnClickListener {
             val code = b.etPairCode.text.toString().trim().uppercase()
             if (code.length < 4) {
-                b.tvStatus.text = "Invalid code"
+                b.tvStatus.text = getString(R.string.pair_invalid_code)
                 return@setOnClickListener
             }
             b.tvStatus.text = getString(R.string.pair_in_progress)
@@ -69,7 +76,8 @@ class ChildSetupActivity : AppCompatActivity() {
                     Prefs.setPairCode(this, code)
                     FirebaseRepo.setChildInfo(code, "${Build.MANUFACTURER} ${Build.MODEL}")
                     MonitorService.start(this)
-                    b.tvStatus.text = "Paired — code: $code"
+                    b.tvStatus.text = getString(R.string.pair_done, code)
+                    requestsPanel.attach()
                 }
             }
         }
@@ -108,9 +116,15 @@ class ChildSetupActivity : AppCompatActivity() {
         b.btnSos.setOnClickListener { confirmSos() }
     }
 
+    override fun onDestroy() {
+        requestsPanel.stop()
+        super.onDestroy()
+    }
+
     override fun onResume() {
         super.onResume()
-        b.tvCallScreeningStatus.text = "Call filtering: ${CallScreeningRole.statusText(this)}"
+        requestsPanel.attach()
+        b.tvCallScreeningStatus.text = getString(R.string.call_filtering_status, CallScreeningRole.statusText(this))
         b.tvProtectionStatus.text = protectionSummary()
         renderGrantStatus()
         // Re-assert the owner policies whenever this screen is opened; an OTA or a
@@ -121,7 +135,7 @@ class ChildSetupActivity : AppCompatActivity() {
         // against what the parent's app shows — the fastest way to catch a
         // mismatch between the two devices.
         val code = Prefs.getPairCode(this)
-        if (!code.isNullOrBlank()) b.tvStatus.text = "Currently paired to code: $code"
+        if (!code.isNullOrBlank()) b.tvStatus.text = getString(R.string.pair_current, code)
     }
 
     /**
@@ -133,18 +147,18 @@ class ChildSetupActivity : AppCompatActivity() {
      */
     private fun renderGrantStatus() {
         val adminOk = policyMgr.isAdminActive
-        b.tvAdminStatus.text = if (adminOk) "✓ Device Admin: active" else "✗ Device Admin: NOT active — tap step 5 below"
+        b.tvAdminStatus.text = getString(if (adminOk) R.string.child_admin_ok else R.string.child_admin_bad)
         b.tvAdminStatus.setTextColor(getColor(if (adminOk) R.color.secondary_dark else R.color.error))
 
         val vpnOk = VpnService.prepare(this) == null
-        b.tvVpnStatus.text = if (vpnOk) "✓ Internet filter: ready" else "✗ Internet filter: NOT set up — tap step 6 below"
+        b.tvVpnStatus.text = getString(if (vpnOk) R.string.child_vpn_ok else R.string.child_vpn_bad)
         b.tvVpnStatus.setTextColor(getColor(if (vpnOk) R.color.secondary_dark else R.color.error))
 
         // Checked directly against Settings.Secure (see AppBlockService.isEnabled),
         // not an in-memory flag — the only reliable way to know app blocking,
         // whole-device lock, time limits and schedules can actually run.
         val accOk = AppBlockService.isEnabled(this)
-        b.tvAccessibilityStatus.text = if (accOk) "✓ App blocking: active" else "✗ App blocking: NOT active — tap step 2 below"
+        b.tvAccessibilityStatus.text = getString(if (accOk) R.string.child_acc_ok else R.string.child_acc_bad)
         b.tvAccessibilityStatus.setTextColor(getColor(if (accOk) R.color.secondary_dark else R.color.error))
     }
 
@@ -154,28 +168,27 @@ class ChildSetupActivity : AppCompatActivity() {
      */
     private fun protectionSummary(): String = when {
         policyMgr.isDeviceOwner ->
-            "Device Owner — uninstall blocked"
+            getString(R.string.protect_owner)
         policyMgr.isAdminActive ->
-            "Device Admin only — can still be removed after disabling admin. " +
-                "For full protection provision as Device Owner (see docs/SETUP.md)."
+            getString(R.string.protect_admin)
         else ->
-            "No protection active — enable Device Admin (step 5)"
+            getString(R.string.protect_none)
     }
 
     private fun confirmSos() {
         val code = Prefs.getPairCode(this)
         if (code.isNullOrBlank()) {
-            Toast.makeText(this, "Pair the device first", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.pair_first), Toast.LENGTH_LONG).show()
             return
         }
         AlertDialog.Builder(this)
-            .setTitle("Send SOS?")
-            .setMessage("An alert and your location will be sent to your parent immediately.")
-            .setPositiveButton("Send") { _, _ ->
+            .setTitle(R.string.sos_confirm_title)
+            .setMessage(R.string.sos_confirm_body)
+            .setPositiveButton(R.string.send) { _, _ ->
                 MonitorService.sendSos(this)
-                Toast.makeText(this, "SOS sent", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.sos_sent), Toast.LENGTH_LONG).show()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
@@ -218,7 +231,7 @@ class ChildSetupActivity : AppCompatActivity() {
             .putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, admin)
             .putExtra(
                 DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                "Enable parental supervision"
+                getString(R.string.admin_explanation)
             )
         startActivity(i)
     }
@@ -295,7 +308,7 @@ class ChildSetupActivity : AppCompatActivity() {
         } catch (_: Exception) {
             Toast.makeText(
                 this,
-                "Open Settings → Battery → find Family Guardian → allow background activity / autostart",
+                getString(R.string.autostart_fallback),
                 Toast.LENGTH_LONG
             ).show()
         }

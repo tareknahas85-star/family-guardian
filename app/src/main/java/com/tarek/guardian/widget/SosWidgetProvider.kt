@@ -1,5 +1,6 @@
 package com.tarek.guardian.widget
 
+import com.tarek.guardian.L10n
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -40,9 +41,9 @@ class SosWidgetProvider : AppWidgetProvider() {
         if (intent.action == ACTION_SOS_TAP) {
             val code = Prefs.getPairCode(ctx)
             if (code.isNullOrBlank()) {
-                Toast.makeText(ctx, "SOS unavailable — device not paired", Toast.LENGTH_LONG).show()
+                Toast.makeText(ctx, L10n.s(R.string.sos_unpaired), Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(ctx, "SOS sent — parent alerted", Toast.LENGTH_LONG).show()
+                Toast.makeText(ctx, L10n.s(R.string.sos_sent_parent), Toast.LENGTH_LONG).show()
                 SosReporter.trigger(ctx, code)
             }
         }

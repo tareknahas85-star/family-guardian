@@ -19,7 +19,7 @@
     <TextView android:id="@+id/btnAppLimit" android:layout_width="wrap_content"
         android:layout_height="wrap_content" android:textSize="12sp"
         android:textStyle="bold" android:textColor="@color/primary"
-        android:text="Limit" android:padding="8dp"
+        android:text="@string/limit" android:padding="8dp"
         android:background="?attr/selectableItemBackgroundBorderless" />
 
     <com.google.android.material.materialswitch.MaterialSwitch

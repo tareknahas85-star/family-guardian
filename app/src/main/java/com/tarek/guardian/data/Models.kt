@@ -1,5 +1,7 @@
 package com.tarek.guardian.data
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 import java.util.Calendar
 
 /** A one-shot instruction from parent to child device. */
@@ -109,7 +111,60 @@ data class Policy(
     /** Show the SOS button on the child's screen. */
     var sosEnabled: Boolean = true,
     /** Send the parent a weekly usage digest. */
-    var weeklyReport: Boolean = true
+    var weeklyReport: Boolean = true,
+
+    // ---- Safe browsing ---------------------------------------------------------
+    /**
+     * Route the child's DNS through a free family filter (CleanBrowsing Family):
+     * adult, gambling and proxy sites stop resolving, Google/Bing/DuckDuckGo
+     * SafeSearch and YouTube Restricted Mode are enforced at the DNS level.
+     */
+    var filterWeb: Boolean = false,
+
+    // ---- Extra time & rewards --------------------------------------------------
+    /** Extra minutes granted for [bonusDate] (yyyyMMdd) only — resets by itself. */
+    var bonusDate: String = "",
+    var bonusMinutes: Int = 0,
+    /** Things the child can do to earn screen time. */
+    var tasks: List<RewardTask> = emptyList()
+)
+
+/** A job the child can mark as done to earn [minutes] of extra screen time. */
+data class RewardTask(
+    var id: String = "",
+    var title: String = "",
+    var minutes: Int = 15
+)
+
+/**
+ * Something the child asks the parent for: more time, or the reward for a task.
+ * Written by the child, decided by the parent. Approving adds [minutes] to
+ * today's bonus.
+ */
+data class ChildRequest(
+    var id: String = "",
+    var type: String = TIME,
+    var minutes: Int = 0,
+    var taskId: String = "",
+    var title: String = "",
+    var ts: Long = 0L,
+    var status: String = PENDING,
+    var decidedTs: Long = 0L
+) {
+    companion object {
+        const val TIME = "TIME"
+        const val TASK = "TASK"
+        const val PENDING = "pending"
+        const val APPROVED = "approved"
+        const val DENIED = "denied"
+    }
+}
+
+/** One recorded position for the day's movement timeline. */
+data class LocPoint(
+    var lat: Double = 0.0,
+    var lng: Double = 0.0,
+    var ts: Long = 0L
 )
 
 /** How incoming (and optionally outgoing) calls are filtered. */
@@ -127,9 +182,9 @@ object CallMode {
     const val WHITELIST_ONLY = "WHITELIST_ONLY"
 
     fun label(mode: String): String = when (mode) {
-        BLOCK_UNKNOWN  -> "Block numbers not in contacts"
-        WHITELIST_ONLY -> "Only my allowed numbers"
-        else           -> "Off"
+        BLOCK_UNKNOWN  -> L10n.s(R.string.mode_block_unknown)
+        WHITELIST_ONLY -> L10n.s(R.string.mode_whitelist)
+        else           -> L10n.s(R.string.off)
     }
 
     /**
@@ -248,6 +303,8 @@ data class Alert(
         const val SETUP_NEEDED  = "SETUP_NEEDED"
         /** The child tried to use Android's screen-pinning to trap a blocked app open. */
         const val PIN_ATTEMPT   = "PIN_ATTEMPT"
+        /** A protection was switched off on the child phone (admin, VPN, accessibility). */
+        const val TAMPER        = "TAMPER"
     }
 }
 
@@ -284,28 +341,34 @@ data class ActivityEvent(
         const val BOOT            = "BOOT"
         /** Screen-pinning was detected active — see MonitorService.checkScreenPinning. */
         const val PIN_ATTEMPT     = "PIN_ATTEMPT"
+        /** A protection the parent relies on was switched off on the child phone. */
+        const val TAMPER          = "TAMPER"
+        /** The child asked for extra screen time. */
+        const val TIME_REQUEST    = "TIME_REQUEST"
 
         /** Everything the parent can choose to be notified about. */
         val ALL = listOf(
             APP_OPENED, APP_BLOCKED, APP_INSTALLED, APP_UNINSTALLED,
             UNLOCK, SCREEN_ON, SCREEN_OFF, CALL, POWER, INTERNET,
-            LIMIT_REACHED, BOOT, PIN_ATTEMPT
+            LIMIT_REACHED, BOOT, PIN_ATTEMPT, TAMPER, TIME_REQUEST
         )
 
         fun label(type: String): String = when (type) {
-            APP_OPENED      -> "App opened"
-            APP_BLOCKED     -> "Blocked app attempt"
-            APP_INSTALLED   -> "App installed"
-            APP_UNINSTALLED -> "App removed"
-            UNLOCK          -> "Phone unlocked"
-            SCREEN_ON       -> "Screen on"
-            SCREEN_OFF      -> "Screen off"
-            CALL            -> "Call"
-            POWER           -> "Charger"
-            INTERNET        -> "Internet changed"
-            LIMIT_REACHED   -> "Time limit reached"
-            BOOT            -> "Phone restarted"
-            PIN_ATTEMPT     -> "Tried to pin an app"
+            APP_OPENED      -> L10n.s(R.string.ev_app_opened)
+            APP_BLOCKED     -> L10n.s(R.string.ev_app_blocked)
+            APP_INSTALLED   -> L10n.s(R.string.ev_app_installed)
+            APP_UNINSTALLED -> L10n.s(R.string.ev_app_uninstalled)
+            UNLOCK          -> L10n.s(R.string.ev_unlock)
+            SCREEN_ON       -> L10n.s(R.string.ev_screen_on)
+            SCREEN_OFF      -> L10n.s(R.string.ev_screen_off)
+            CALL            -> L10n.s(R.string.ev_call)
+            POWER           -> L10n.s(R.string.ev_power)
+            INTERNET        -> L10n.s(R.string.ev_internet)
+            LIMIT_REACHED   -> L10n.s(R.string.ev_limit)
+            BOOT            -> L10n.s(R.string.ev_boot)
+            PIN_ATTEMPT     -> L10n.s(R.string.ev_pin)
+            TAMPER          -> L10n.s(R.string.ev_tamper)
+            TIME_REQUEST    -> L10n.s(R.string.ev_request)
             else            -> type
         }
     }

@@ -16,8 +16,8 @@ android {
         // install over an existing copy and you end up testing the old build.
         // versionName is what the About screen prints — keep it in step so the
         // installed version is verifiable at a glance.
-        versionCode = 29
-        versionName = "9.5"
+        versionCode = 30
+        versionName = "10.0"
     }
 
     buildTypes {
@@ -72,4 +72,7 @@ dependencies {
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+
+    // Plain JVM unit tests (DNS filter packet code).
+    testImplementation("junit:junit:4.13.2")
 }

@@ -1,5 +1,7 @@
 package com.tarek.guardian.monitor
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -28,7 +30,7 @@ class BootReceiver : BroadcastReceiver() {
                 MonitorService.start(context)
                 EventReporter.record(
                     context, ActivityEvent.BOOT,
-                    if (isUpdate) "App updated" else "Phone restarted"
+                    L10n.s(if (isUpdate) R.string.ev_app_updated else R.string.ev_boot)
                 )
             }
             Prefs.ROLE_PARENT -> ParentAlertService.start(context)

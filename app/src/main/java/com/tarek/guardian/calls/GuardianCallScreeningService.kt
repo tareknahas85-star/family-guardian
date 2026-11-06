@@ -1,5 +1,7 @@
 package com.tarek.guardian.calls
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 import android.os.Build
 import android.telecom.Call
 import android.telecom.CallScreeningService
@@ -82,7 +84,7 @@ class GuardianCallScreeningService : CallScreeningService() {
         if (!shouldAlert) return
 
         val shown = NumberUtils.display(number)
-        val direction = if (outgoing) "outgoing" else "incoming"
+        val direction = L10n.s(if (outgoing) R.string.call_outgoing else R.string.call_incoming)
 
         FirebaseRepo.reportCall(
             code,
@@ -100,8 +102,8 @@ class GuardianCallScreeningService : CallScreeningService() {
             code,
             Alert(
                 type = if (blocked) Alert.BLOCKED_CALL else Alert.UNKNOWN_CALL,
-                title = if (blocked) "Call blocked"
-                        else "Unknown caller",
+                title = L10n.s(if (blocked) R.string.call_blocked
+                        else R.string.unknown_caller),
                 body = "$shown — $direction",
                 number = number ?: "",
                 ts = System.currentTimeMillis()

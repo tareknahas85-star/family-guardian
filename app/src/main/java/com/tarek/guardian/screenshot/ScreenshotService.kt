@@ -1,5 +1,7 @@
 package com.tarek.guardian.screenshot
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -25,7 +27,7 @@ object ScreenshotService {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     fun trigger(ctx: Context) {
-        Toast.makeText(ctx, "Screenshot captured — uploading...", Toast.LENGTH_SHORT).show()
+        Toast.makeText(ctx, L10n.s(R.string.screenshot_uploading), Toast.LENGTH_SHORT).show()
         captureAndUpload(ctx)
     }
 

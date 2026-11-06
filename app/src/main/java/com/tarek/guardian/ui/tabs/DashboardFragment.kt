@@ -1,5 +1,6 @@
 package com.tarek.guardian.ui.tabs
 
+import com.tarek.guardian.L10n
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -12,6 +13,7 @@ import com.tarek.guardian.R
 import com.tarek.guardian.alerts.AlertNotifier
 import com.tarek.guardian.data.ActivityEvent
 import com.tarek.guardian.data.Alert
+import com.tarek.guardian.data.ChildRequest
 import com.tarek.guardian.databinding.FragmentDashboardBinding
 import com.tarek.guardian.ui.GuardianState
 import java.text.SimpleDateFormat
@@ -40,13 +42,13 @@ class DashboardFragment : TabBase() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        b.btnLock.setOnClickListener   { host?.sendCommand("LOCK_NOW", "Lock sent") }
-        b.btnUnlock.setOnClickListener { host?.sendCommand("UNLOCK", "Unlock sent") }
-        b.btnNetOff.setOnClickListener { host?.sendCommand("BLOCK_INTERNET", "Internet paused") }
-        b.btnNetOn.setOnClickListener  { host?.sendCommand("ALLOW_INTERNET", "Internet resumed") }
+        b.btnLock.setOnClickListener   { host?.sendCommand("LOCK_NOW", L10n.s(R.string.lock_sent)) }
+        b.btnUnlock.setOnClickListener { host?.sendCommand("UNLOCK", L10n.s(R.string.unlock_sent)) }
+        b.btnNetOff.setOnClickListener { host?.sendCommand("BLOCK_INTERNET", L10n.s(R.string.internet_paused)) }
+        b.btnNetOn.setOnClickListener  { host?.sendCommand("ALLOW_INTERNET", L10n.s(R.string.internet_resumed)) }
         b.btnFixNotif.setOnClickListener { host?.openNotificationSettings() }
         b.btnFixDoze.setOnClickListener { host?.requestNoDoze() }
-        b.btnLocate.setOnClickListener { host?.sendCommand("LOCATE", "Asking for a fresh position") }
+        b.btnLocate.setOnClickListener { host?.sendCommand("LOCATE", L10n.s(R.string.locating_child)) }
         b.btnPair.setOnClickListener { host?.openPairingWindow() }
         b.btnMap.setOnClickListener { openMap() }
 
@@ -65,15 +67,15 @@ class DashboardFragment : TabBase() {
                 Alert(
                     id = "test-${System.currentTimeMillis()}",
                     type = Alert.SOS,
-                    title = "Test alert",
-                    body = "If you can see this, alerts are working.",
+                    title = L10n.s(R.string.test_alert_title),
+                    body = L10n.s(R.string.test_alert_body),
                     ts = System.currentTimeMillis()
                 )
             )
             Toast.makeText(
                 ctx,
-                if (ok) "Sent — check your notifications"
-                else "Blocked. Notifications are off for this app.",
+                if (ok) L10n.s(R.string.test_sent)
+                else L10n.s(R.string.test_blocked),
                 Toast.LENGTH_LONG
             ).show()
             refreshNotifWarning()
@@ -101,6 +103,7 @@ class DashboardFragment : TabBase() {
     }
 
     override fun render(s: GuardianState.Snapshot) {
+        renderRequests(s)
         renderLocation(s)
         renderScreenTime(s)
         renderDevice(s)
@@ -117,22 +120,49 @@ class DashboardFragment : TabBase() {
         val now = System.currentTimeMillis()
         b.tvNetTimerStatus.text = if (until > now) {
             val remaining = ((until - now) / 60_000L).toInt().coerceAtLeast(1)
-            "Internet is open — ${fmt(remaining)} left, then it re-blocks itself"
+            L10n.s(R.string.net_timer_running, fmt(remaining))
         } else {
-            "Grant a bounded internet window; it turns off by itself when time is up."
+            L10n.s(R.string.net_timer_idle)
+        }
+    }
+
+    /** Pending asks from the child, each with Approve / Deny. */
+    private fun renderRequests(s: GuardianState.Snapshot) {
+        val pending = s.requests.filter { it.status == ChildRequest.PENDING }.sortedByDescending { it.ts }
+        b.cardRequests.visibility = if (pending.isEmpty()) View.GONE else View.VISIBLE
+        val hostView = b.requestsHost
+        hostView.removeAllViews()
+        val inflater = LayoutInflater.from(context)
+        for (r in pending) {
+            val row = inflater.inflate(R.layout.item_action_row, hostView, false)
+            row.findViewById<TextView>(R.id.tvRowTitle).text =
+                if (r.type == ChildRequest.TASK) L10n.s(R.string.req_task_body, r.title, fmt(r.minutes))
+                else L10n.s(R.string.req_time_body, fmt(r.minutes))
+            row.findViewById<TextView>(R.id.tvRowDetail).text = GuardianState.relativeTime(r.ts)
+            row.findViewById<TextView>(R.id.btnRowA).apply {
+                visibility = View.VISIBLE
+                text = L10n.s(R.string.approve)
+                setOnClickListener { host?.decideRequest(r.id, true) }
+            }
+            row.findViewById<TextView>(R.id.btnRowB).apply {
+                visibility = View.VISIBLE
+                text = L10n.s(R.string.deny)
+                setOnClickListener { host?.decideRequest(r.id, false) }
+            }
+            hostView.addView(row)
         }
     }
 
     private fun renderLocation(s: GuardianState.Snapshot) {
         b.tvLocation.text = when {
-            s.error != null  -> "Cannot connect"
-            s.hasLocation    -> "%.4f, %.4f".format(s.lat, s.lng)
-            s.lastSeen == 0L -> "Not paired yet"
-            else             -> "No location yet"
+            s.error != null  -> L10n.s(R.string.cannot_connect)
+            s.hasLocation    -> String.format(Locale.ENGLISH, "%.4f, %.4f", s.lat, s.lng)
+            s.lastSeen == 0L -> L10n.s(R.string.not_paired_yet)
+            else             -> L10n.s(R.string.no_location_yet)
         }
         b.tvZoneState.text = s.error
-            ?: if (s.hasLocation) "Updated ${GuardianState.relativeTime(s.locationTs)}" else ""
-        b.tvConnection.text = if (s.isOnline) "Online" else "Offline"
+            ?: if (s.hasLocation) L10n.s(R.string.updated_ago, GuardianState.relativeTime(s.locationTs)) else ""
+        b.tvConnection.text = if (s.isOnline) L10n.s(R.string.online) else L10n.s(R.string.offline)
         b.tvBattery.text = when {
             s.battery < 0 -> "—"
             s.charging    -> "${s.battery}% ⚡"
@@ -144,19 +174,22 @@ class DashboardFragment : TabBase() {
         val total = s.usage.values.sum()
         val limit = dailyLimitMinutes(s)
         b.tvUsedTotal.text = fmt(total)
-        b.tvLimit.text = if (limit > 0) "Limit ${fmt(limit)}" else "No daily limit set"
+        val bonus = bonusToday(s)
+        b.tvLimit.text = if (limit > 0) {
+            L10n.s(R.string.limit_x, fmt(limit)) +
+                if (bonus > 0) "  ·  " + L10n.s(R.string.bonus_today, fmt(bonus)) else ""
+        } else L10n.s(R.string.no_daily_limit)
         if (limit > 0) {
-            b.ring.progress = total.toFloat() / limit
-            val left = limit - total
-            b.tvRemaining.text = if (left >= 0) "${fmt(left)} left" else "over by ${fmt(-left)}"
+            b.ring.progress = total.toFloat() / (limit + bonus)
+            val left = limit + bonus - total
+            b.tvRemaining.text = if (left >= 0) L10n.s(R.string.time_left, fmt(left)) else L10n.s(R.string.time_over, fmt(-left))
         } else {
             b.ring.progress = 0f
             b.tvRemaining.text = ""
         }
 
         b.tvTopApps.text = if (s.usage.isEmpty()) {
-            "No usage data yet.\n\nIf the phone has been in use, Usage Access is probably not " +
-                "granted. On the child phone, open the app and use button 1."
+            L10n.s(R.string.no_usage_long)
         } else {
             s.usage.entries.sortedByDescending { it.value }.take(4)
                 .joinToString("\n") { (pkg, min) -> "${appLabel(pkg)}  ·  ${fmt(min)}" }
@@ -165,15 +198,15 @@ class DashboardFragment : TabBase() {
 
     private fun renderDevice(s: GuardianState.Snapshot) {
         b.tvDevice.text = s.model.ifBlank {
-            if (s.lastSeen == 0L) "Not connected" else "Child device"
+            if (s.lastSeen == 0L) L10n.s(R.string.not_connected) else L10n.s(R.string.child_device)
         }
         b.tvSeen.text = when {
             s.error != null           -> s.error
-            s.lastSeen == 0L          -> "Enter the code on the child phone while the window is open."
-            s.isOnline                -> "Online now"
-            s.minutesSinceSeen < 60   -> "Last seen ${s.minutesSinceSeen} min ago"
-            s.minutesSinceSeen < 1440 -> "Last seen ${s.minutesSinceSeen / 60} h ago — check battery settings"
-            else                      -> "Offline for ${s.minutesSinceSeen / 1440} days"
+            s.lastSeen == 0L          -> L10n.s(R.string.enter_code_hint)
+            s.isOnline                -> L10n.s(R.string.online_now)
+            s.minutesSinceSeen < 60   -> L10n.p(R.plurals.last_seen_min, s.minutesSinceSeen.toInt())
+            s.minutesSinceSeen < 1440 -> L10n.p(R.plurals.last_seen_hour, (s.minutesSinceSeen / 60).toInt())
+            else                      -> L10n.p(R.plurals.offline_days, (s.minutesSinceSeen / 1440).toInt())
         }
 
         // Reported by the child device itself (see MonitorService.cycle()) —
@@ -181,21 +214,21 @@ class DashboardFragment : TabBase() {
         // is a different device and told the parent nothing true about the
         // child's actual protection state.
         val ctx2 = context
-        b.tvAdminStatus.text = if (s.adminActive) "✓ Device Admin: active" else "✗ Device Admin: NOT active — check Setup on the child's phone"
-        b.tvVpnStatus.text = if (s.vpnReady) "✓ Internet blocking: ready" else "✗ Internet blocking: needs setup — check Setup on the child's phone"
+        b.tvAdminStatus.text = L10n.s(if (s.adminActive) R.string.dash_admin_ok else R.string.dash_admin_bad)
+        b.tvVpnStatus.text = L10n.s(if (s.vpnReady) R.string.dash_vpn_ok else R.string.dash_vpn_bad)
         // App blocking, whole-device lock, time limits and schedules all run
         // through the Accessibility Service — a separate OS grant from Device
         // Admin/VPN above. Some phones (Huawei especially) silently turn this
         // off on their own; this line is the only way to see that happened.
-        b.tvAccessibilityStatus.text = if (s.accessibilityActive) "✓ App blocking: active" else "✗ App blocking: NOT active — check Setup on the child's phone (step 2)"
+        b.tvAccessibilityStatus.text = L10n.s(if (s.accessibilityActive) R.string.dash_acc_ok else R.string.dash_acc_bad)
         if (ctx2 != null) {
             b.tvAdminStatus.setTextColor(ctx2.getColor(if (s.adminActive) R.color.secondary_dark else R.color.error))
             b.tvVpnStatus.setTextColor(ctx2.getColor(if (s.vpnReady) R.color.secondary_dark else R.color.error))
             b.tvAccessibilityStatus.setTextColor(ctx2.getColor(if (s.accessibilityActive) R.color.secondary_dark else R.color.error))
         }
 
-        b.tvZonesSummary.text = if (s.policy.zones.isEmpty()) "No safe zones set."
-        else "${s.policy.zones.size} safe zone(s): " + s.policy.zones.joinToString(", ") { it.name }
+        b.tvZonesSummary.text = if (s.policy.zones.isEmpty()) L10n.s(R.string.no_zones_set)
+        else L10n.p(R.plurals.zones_summary, s.policy.zones.size, s.policy.zones.size, s.policy.zones.joinToString(", ") { it.name })
     }
 
     /**
@@ -247,18 +280,23 @@ class DashboardFragment : TabBase() {
     private fun openMap() {
         val s = GuardianState.snapshot
         if (!s.hasLocation) {
-            Toast.makeText(context, "No position reported yet", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, L10n.s(R.string.no_position_yet), Toast.LENGTH_SHORT).show()
             return
         }
         try {
             startActivity(
-                Intent(Intent.ACTION_VIEW, Uri.parse("geo:${s.lat},${s.lng}?q=${s.lat},${s.lng}(Child)"))
+                Intent(Intent.ACTION_VIEW, Uri.parse("geo:${s.lat},${s.lng}?q=${s.lat},${s.lng}(${Uri.encode(L10n.s(R.string.map_label_child))})"))
             )
         } catch (_: Exception) {
             startActivity(
                 Intent(Intent.ACTION_VIEW, Uri.parse("https://maps.google.com/?q=${s.lat},${s.lng}"))
             )
         }
+    }
+
+    private fun bonusToday(s: GuardianState.Snapshot): Int {
+        val today = SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
+        return if (s.policy.bonusDate == today) s.policy.bonusMinutes else 0
     }
 
     private fun dailyLimitMinutes(s: GuardianState.Snapshot): Int =

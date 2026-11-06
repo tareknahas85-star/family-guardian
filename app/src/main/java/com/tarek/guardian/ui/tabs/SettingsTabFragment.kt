@@ -1,5 +1,6 @@
 package com.tarek.guardian.ui.tabs
 
+import com.tarek.guardian.L10n
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.Editable
@@ -25,6 +26,7 @@ import com.tarek.guardian.alerts.AlertNotifier
 import com.tarek.guardian.calls.NumberUtils
 import com.tarek.guardian.data.CallMode
 import com.tarek.guardian.data.GeoZone
+import com.tarek.guardian.data.RewardTask
 import com.tarek.guardian.databinding.FragmentSettingsTabBinding
 import com.tarek.guardian.monitor.ScheduleEvaluator
 import com.tarek.guardian.ui.GuardianState
@@ -91,10 +93,18 @@ class SettingsTabFragment : TabBase() {
         b.swInternet.onChange { on ->
             host?.sendCommand(
                 if (on) "BLOCK_INTERNET" else "ALLOW_INTERNET",
-                if (on) "Internet paused" else "Internet resumed"
+                L10n.s(if (on) R.string.internet_paused else R.string.internet_resumed)
             )
         }
         b.swCamera.onChange { on -> host?.savePolicy { it.cameraDisabled = on } }
+        b.swFilterWeb.onChange { on -> host?.savePolicy { it.filterWeb = on } }
+
+        // ── Rewards ──
+        b.btnAddTask.setOnClickListener { addTask() }
+
+        // ── Another parent ──
+        b.tvSecondParent.text = L10n.s(R.string.second_parent_hint, GuardianState.snapshot.code)
+        b.btnInviteParent.setOnClickListener { host?.openPairingWindow() }
 
         b.sliderLimit.addOnChangeListener { _, value, _ ->
             b.tvLimitValue.text = limitLabel(value.toInt())
@@ -143,9 +153,9 @@ class SettingsTabFragment : TabBase() {
         super.onResume()
         val ctx = context ?: return
         b.tvNotifState.text = if (AlertNotifier.canPost(ctx)) {
-            "Alerts can reach this phone."
+            L10n.s(R.string.alerts_ok)
         } else {
-            "Alerts are blocked. SOS and unknown callers will not reach you."
+            L10n.s(R.string.alerts_blocked)
         }
     }
 
@@ -164,6 +174,7 @@ class SettingsTabFragment : TabBase() {
         b.swFeed.isChecked        = s.policy.activityFeedEnabled
         b.swLockAtLimit.isChecked = s.policy.lockWhenLimitReached
         b.swCamera.isChecked      = s.policy.cameraDisabled
+        b.swFilterWeb.isChecked   = s.policy.filterWeb
 
         val limit = s.policy.dailyLimitMinutes.coerceIn(0, 480)
         b.sliderLimit.value = limit.toFloat()
@@ -185,24 +196,66 @@ class SettingsTabFragment : TabBase() {
         binding = false
 
         b.tvCallHint.text = buildString {
-            append("Emergency numbers are never blocked. ")
+            append(L10n.s(R.string.emergency_never_blocked))
             if (s.policy.priorityNumbers.isNotEmpty()) {
-                append("${s.policy.priorityNumbers.size} number(s) always ring.")
+                append(L10n.p(R.plurals.priority_count, s.policy.priorityNumbers.size))
             }
         }
 
-        b.tvZonesList.text = if (s.policy.zones.isEmpty()) "No safe zones yet."
-        else s.policy.zones.joinToString("\n") { "${it.name}  ·  ${it.radiusM} m" }
+        b.tvZonesList.text = if (s.policy.zones.isEmpty()) L10n.s(R.string.no_zones_yet)
+        else s.policy.zones.joinToString("\n") { L10n.s(R.string.zone_row, it.name, it.radiusM) }
 
-        b.tvRulesList.text = if (s.policy.schedules.isEmpty()) "No time rules yet."
+        b.tvRulesList.text = if (s.policy.schedules.isEmpty()) L10n.s(R.string.no_rules_yet)
         else s.policy.schedules.joinToString("\n") { r ->
-            "${r.name}  ·  ${ScheduleEvaluator.formatMinute(r.startMinute)}" +
+            "${ScheduleEvaluator.ruleName(r)}  ·  ${ScheduleEvaluator.formatMinute(r.startMinute)}" +
                 "–${ScheduleEvaluator.formatMinute(r.endMinute)}"
         }
+
+        b.tvSecondParent.text = L10n.s(R.string.second_parent_hint, s.code)
+        renderTasks(s)
 
         lastApps = s.installedApps
         lastBlocked = s.policy.blockedApps.toSet()
         renderApps(lastApps, lastBlocked)
+    }
+
+    // ── Rewards ───────────────────────────────────────────────────────────────
+
+    private fun addTask() {
+        val title = b.etTaskTitle.text.toString().trim()
+        if (title.isBlank()) {
+            Toast.makeText(context, L10n.s(R.string.task_need_title), Toast.LENGTH_SHORT).show()
+            return
+        }
+        val minutes = b.etTaskMinutes.text.toString().trim().toIntOrNull()?.coerceIn(5, 240) ?: 15
+        host?.savePolicy { p ->
+            p.tasks = p.tasks + RewardTask(id = "t${System.currentTimeMillis()}", title = title, minutes = minutes)
+        }
+        b.etTaskTitle.setText("")
+    }
+
+    private fun renderTasks(s: GuardianState.Snapshot) {
+        val hostView = b.tasksHost
+        hostView.removeAllViews()
+        val inflater = LayoutInflater.from(context)
+        if (s.policy.tasks.isEmpty()) {
+            hostView.addView(TextView(context).apply {
+                text = L10n.s(R.string.no_tasks_parent)
+                textSize = 13f
+            })
+            return
+        }
+        for (t in s.policy.tasks) {
+            val row = inflater.inflate(R.layout.item_action_row, hostView, false)
+            row.findViewById<TextView>(R.id.tvRowTitle).text = t.title
+            row.findViewById<TextView>(R.id.tvRowDetail).text = L10n.s(R.string.task_reward, fmt(t.minutes))
+            row.findViewById<TextView>(R.id.btnRowB).apply {
+                visibility = View.VISIBLE
+                text = L10n.s(R.string.delete)
+                setOnClickListener { host?.savePolicy { p -> p.tasks = p.tasks.filter { it.id != t.id } } }
+            }
+            hostView.addView(row)
+        }
     }
 
     // ── Numbers ───────────────────────────────────────────────────────────────
@@ -223,9 +276,9 @@ class SettingsTabFragment : TabBase() {
         // and in whitelist mode a typo means that person gets blocked.
         val suspicious = (priority + allowed).filter { NumberUtils.digitsOnly(it).length in 1..8 }
         val msg = if (suspicious.isEmpty()) {
-            "Saved"
+            L10n.s(R.string.saved)
         } else {
-            "Saved, but check these — they look too short: ${suspicious.joinToString(", ")}"
+            L10n.s(R.string.saved_check_short, suspicious.joinToString(", "))
         }
         Toast.makeText(context, msg, if (suspicious.isEmpty()) Toast.LENGTH_SHORT else Toast.LENGTH_LONG).show()
     }
@@ -254,16 +307,16 @@ class SettingsTabFragment : TabBase() {
             return
         }
         val existing = GuardianState.snapshot.policy.zones.size
-        val name = b.etZoneName.text.toString().trim().ifBlank { "Zone ${existing + 1}" }
+        val name = b.etZoneName.text.toString().trim().ifBlank { L10n.s(R.string.zone_default_name, existing + 1) }
         val radius = b.etZoneRadius.text.toString().trim().toIntOrNull()?.coerceIn(50, 5000) ?: 200
 
-        Toast.makeText(ctx, "Locating…", Toast.LENGTH_SHORT).show()
+        Toast.makeText(ctx, L10n.s(R.string.locating), Toast.LENGTH_SHORT).show()
         try {
             LocationServices.getFusedLocationProviderClient(ctx)
                 .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, CancellationTokenSource().token)
                 .addOnSuccessListener { loc ->
                     if (loc == null) {
-                        Toast.makeText(ctx, "Could not get a position", Toast.LENGTH_LONG).show()
+                        Toast.makeText(ctx, L10n.s(R.string.no_position), Toast.LENGTH_LONG).show()
                         return@addOnSuccessListener
                     }
                     host?.savePolicy { p ->
@@ -281,15 +334,14 @@ class SettingsTabFragment : TabBase() {
 
     // ── Apps ──────────────────────────────────────────────────────────────────
 
-    private fun limitLabel(minutes: Int) = if (minutes <= 0) "Off" else fmt(minutes)
+    private fun limitLabel(minutes: Int) = if (minutes <= 0) L10n.s(R.string.off) else fmt(minutes)
 
     private fun renderApps(apps: Map<String, String>, blocked: Set<String>) {
         val hostView = b.appsHost
         hostView.removeAllViews()
 
         if (apps.isEmpty()) {
-            b.tvAppsHint.text = "The child device has not sent its app list yet. " +
-                "It reports once an hour."
+            b.tvAppsHint.text = L10n.s(R.string.apps_not_sent)
             return
         }
 
@@ -300,8 +352,8 @@ class SettingsTabFragment : TabBase() {
                     .thenBy { it.value.lowercase() }
             )
 
-        b.tvAppsHint.text = "${blocked.size} restricted of ${apps.size} apps" +
-            if (appFilter.isNotEmpty()) "  ·  ${matching.size} matching" else ""
+        b.tvAppsHint.text = L10n.s(R.string.apps_restricted_of, blocked.size, apps.size) +
+            if (appFilter.isNotEmpty()) "  ·  " + L10n.s(R.string.apps_matching, matching.size) else ""
 
         val inflater = LayoutInflater.from(context)
         for ((pkg, label) in matching.take(40)) {
@@ -310,12 +362,12 @@ class SettingsTabFragment : TabBase() {
             val isBlocked = pkg in blocked
             val limitMinutes = appLimitMinutes(pkg)
             row.findViewById<TextView>(R.id.tvAppState).text = when {
-                isBlocked         -> "Restricted"
-                limitMinutes > 0  -> "Limit: ${fmt(limitMinutes)}/day"
-                else              -> "Allowed"
+                isBlocked         -> L10n.s(R.string.app_restricted)
+                limitMinutes > 0  -> L10n.s(R.string.app_limit_day, fmt(limitMinutes))
+                else              -> L10n.s(R.string.app_allowed)
             }
             row.findViewById<TextView>(R.id.btnAppLimit).apply {
-                text = if (limitMinutes > 0) "Limit: ${fmt(limitMinutes)}" else "Set limit"
+                text = if (limitMinutes > 0) L10n.s(R.string.app_limit_btn, fmt(limitMinutes)) else L10n.s(R.string.set_limit)
                 setOnClickListener { showAppLimitDialog(pkg, label) }
             }
             val sw = row.findViewById<MaterialSwitch>(R.id.swApp)
@@ -332,7 +384,7 @@ class SettingsTabFragment : TabBase() {
         }
         if (matching.size > 40) {
             hostView.addView(TextView(context).apply {
-                text = "…and ${matching.size - 40} more. Use the search box."
+                text = L10n.s(R.string.apps_more, matching.size - 40)
                 textSize = 12f
                 setPadding(0, 12, 0, 0)
             })
@@ -363,9 +415,9 @@ class SettingsTabFragment : TabBase() {
     private fun showAppLimitDialog(pkg: String, label: String) {
         val ctx = context ?: return
         val presets = listOf(0, 10, 15, 30, 60, 120, 240)
-        val labels = presets.map { if (it == 0) "No limit" else fmt(it) } + "Custom…"
+        val labels = presets.map { if (it == 0) L10n.s(R.string.no_limit) else fmt(it) } + L10n.s(R.string.custom)
         AlertDialog.Builder(ctx)
-            .setTitle("Daily limit — $label")
+            .setTitle(L10n.s(R.string.daily_limit_for, label))
             .setItems(labels.toTypedArray()) { _, which ->
                 if (which < presets.size) {
                     setAppLimit(pkg, presets[which])
@@ -381,16 +433,16 @@ class SettingsTabFragment : TabBase() {
         val current = appLimitMinutes(pkg)
         val input = EditText(ctx).apply {
             inputType = InputType.TYPE_CLASS_NUMBER
-            hint = "Minutes per day"
+            hint = L10n.s(R.string.minutes_per_day)
             if (current > 0) setText(current.toString())
         }
         AlertDialog.Builder(ctx)
-            .setTitle("Daily limit — $label")
+            .setTitle(L10n.s(R.string.daily_limit_for, label))
             .setView(input)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton(R.string.save) { _, _ ->
                 setAppLimit(pkg, input.text.toString().toIntOrNull() ?: 0)
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 

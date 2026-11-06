@@ -1,5 +1,6 @@
 package com.tarek.guardian.ui.tabs
 
+import com.tarek.guardian.L10n
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -44,19 +45,19 @@ class LiveFragment : TabBase() {
     override fun render(s: GuardianState.Snapshot) {
         val chosen = s.policy.notifyOnEvents
         b.tvNotifySummary.text = if (chosen.isEmpty()) {
-            "Nothing. Events are logged below but your phone stays quiet."
+            L10n.s(R.string.notify_nothing)
         } else {
-            chosen.joinToString(", ") { ActivityEvent.label(it) }
+            chosen.joinToString(if (L10n.isArabic) "، " else ", ") { ActivityEvent.label(it) }
         }
 
         b.tvLiveHint.text = when {
             !s.policy.activityFeedEnabled ->
-                "Recording is off. Turn the activity feed on in Settings."
+                L10n.s(R.string.feed_off)
             s.events.isEmpty() && s.lastSeen == 0L ->
-                "Nothing yet — pair the child device first."
+                L10n.s(R.string.feed_pair_first)
             s.events.isEmpty() ->
-                "Nothing yet. App opens need the Accessibility service on the child phone (button 2)."
-            else -> "${s.events.size} recent events"
+                L10n.s(R.string.feed_need_acc)
+            else -> L10n.p(R.plurals.recent_events, s.events.size)
         }
 
         renderFeed(s)
@@ -68,7 +69,7 @@ class LiveFragment : TabBase() {
         if (s.events.isEmpty()) return
 
         val time = SimpleDateFormat("HH:mm", Locale.US)
-        val day = SimpleDateFormat("MMM d", Locale.US)
+        val day = SimpleDateFormat("d MMM", L10n.dateLocale())
         val today = day.format(Date())
         val inflater = LayoutInflater.from(context)
 
@@ -117,17 +118,17 @@ class LiveFragment : TabBase() {
         val checked = BooleanArray(types.size) { types[it] in current }
 
         AlertDialog.Builder(ctx)
-            .setTitle("Notify me about")
+            .setTitle(R.string.notify_me_about)
             .setMultiChoiceItems(labels, checked) { _, which, isChecked ->
                 if (isChecked) current.add(types[which]) else current.remove(types[which])
             }
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton(R.string.save) { _, _ ->
                 host?.savePolicy { it.notifyOnEvents = current.toList() }
             }
-            .setNeutralButton("Everything") { _, _ ->
+            .setNeutralButton(R.string.everything) { _, _ ->
                 host?.savePolicy { it.notifyOnEvents = ActivityEvent.ALL }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 

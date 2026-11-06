@@ -11,14 +11,34 @@
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="vertical" android:padding="18dp">
                 <TextView style="@style/Text.SectionLabel" android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:text="Today" />
+                    android:layout_height="wrap_content" android:text="@string/today" />
                 <TextView android:id="@+id/tvTotal" style="@style/Text.Metric"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:text="—" android:paddingTop="2dp" />
                 <TextView android:id="@+id/tvBreakdown" style="@style/Text.Body"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:textSize="14sp" android:paddingTop="12dp"
-                    android:text="No usage data yet" />
+                    android:text="@string/no_usage_yet" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Today's movement: grouped into stops, each opens on the map -->
+        <androidx.cardview.widget.CardView style="@style/Card.Guardian"
+            android:layout_width="match_parent" android:layout_height="wrap_content">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="18dp">
+                <TextView style="@style/Text.SectionLabel" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="@string/timeline_title" />
+                <TextView android:id="@+id/tvTimelineEmpty" style="@style/Text.Body"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:textSize="14sp" android:paddingTop="8dp" android:text="@string/timeline_empty" />
+                <LinearLayout android:id="@+id/stopsHost" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="vertical"
+                    android:paddingTop="6dp" />
+                <Button android:id="@+id/btnRoute" style="@style/Button.Outline"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="@string/timeline_route" android:layout_marginTop="8dp"
+                    android:visibility="gone" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -27,11 +47,11 @@
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="vertical" android:padding="18dp">
                 <TextView style="@style/Text.SectionLabel" android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:text="Time rules" />
+                    android:layout_height="wrap_content" android:text="@string/time_rules" />
                 <TextView android:id="@+id/tvSchedules" style="@style/Text.Body"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:textSize="14sp" android:paddingTop="10dp"
-                    android:text="No time rules set" />
+                    android:text="@string/no_time_rules" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -40,7 +60,7 @@
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="vertical" android:padding="18dp">
                 <TextView style="@style/Text.SectionLabel" android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:text="App usage" />
+                    android:layout_height="wrap_content" android:text="@string/app_usage" />
                 <LinearLayout android:id="@+id/barsHost"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="vertical" android:paddingTop="12dp" />
@@ -52,10 +72,10 @@
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="vertical" android:padding="18dp">
                 <TextView style="@style/Text.SectionLabel" android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:text="Alerts and calls" />
+                    android:layout_height="wrap_content" android:text="@string/alerts_and_calls" />
                 <TextView android:id="@+id/tvTimeline" style="@style/Text.Body"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:textSize="14sp" android:paddingTop="10dp" android:text="Nothing yet" />
+                    android:textSize="14sp" android:paddingTop="10dp" android:text="@string/nothing_yet" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </LinearLayout>

@@ -8,6 +8,8 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseException
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.MutableData
+import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
 
 /**
@@ -523,5 +525,127 @@ object FirebaseRepo {
                 Log.e(TAG, "readUsageForDate failed: ${e.message}")
                 onData(emptyMap())
             }
+    }
+
+    // ---------- Requests: extra time & task rewards ----------
+
+    private fun today(): String =
+        java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.US).format(java.util.Date())
+
+    /** Child side: ask the parent for something. */
+    fun pushRequest(code: String, req: ChildRequest, onDone: ((Boolean) -> Unit)? = null) {
+        if (code.isBlank()) { onDone?.invoke(false); return }
+        val ref = root(code).child("requests").push()
+        req.id = ref.key ?: ""
+        req.ts = System.currentTimeMillis()
+        req.status = ChildRequest.PENDING
+        ref.setValue(req)
+            .addOnSuccessListener { onDone?.invoke(true) }
+            .addOnFailureListener { onDone?.invoke(false) }
+    }
+
+    /** Both sides: the latest requests, newest last. */
+    fun listenRequests(code: String, onData: (List<ChildRequest>) -> Unit): ValueEventListener {
+        val ref = root(code).child("requests").orderByChild("ts").limitToLast(30)
+        val l = object : ValueEventListener {
+            override fun onDataChange(s: DataSnapshot) {
+                onData(s.children.mapNotNull { c ->
+                    c.getValue(ChildRequest::class.java)?.also { if (it.id.isBlank()) it.id = c.key ?: "" }
+                })
+            }
+            override fun onCancelled(e: DatabaseError) {
+                Log.e(TAG, "DB Error [requests/$code]: ${e.message}")
+            }
+        }
+        ref.addValueEventListener(l)
+        return l
+    }
+
+    fun detachRequests(code: String, l: ValueEventListener) =
+        root(code).child("requests").orderByChild("ts").limitToLast(30).removeEventListener(l)
+
+    fun detachPolicy(code: String, l: ValueEventListener) =
+        root(code).child("policy").removeEventListener(l)
+
+    fun detachTrack(code: String, date: String, l: ValueEventListener) =
+        root(code).child("reports").child("track").child(date).removeEventListener(l)
+
+    /**
+     * Parent side: approve or deny. Two transactions, so tapping Approve twice
+     * (in the app and in the notification) can never grant the minutes twice:
+     * the first one flips the status from pending, the second sees it decided.
+     */
+    fun decideRequest(code: String, requestId: String, approve: Boolean, onDone: ((Boolean) -> Unit)? = null) {
+        if (code.isBlank() || requestId.isBlank()) { onDone?.invoke(false); return }
+        var minutes = 0
+        root(code).child("requests").child(requestId).runTransaction(object : Transaction.Handler {
+            override fun doTransaction(d: MutableData): Transaction.Result {
+                // First pass can run on an empty local cache; returning success
+                // here lets the server answer with the real node and retry.
+                if (d.value == null) return Transaction.success(d)
+                val status = d.child("status").getValue(String::class.java) ?: return Transaction.abort()
+                if (status != ChildRequest.PENDING) return Transaction.abort()
+                minutes = d.child("minutes").getValue(Int::class.java) ?: 0
+                d.child("status").value = if (approve) ChildRequest.APPROVED else ChildRequest.DENIED
+                d.child("decidedTs").value = System.currentTimeMillis()
+                return Transaction.success(d)
+            }
+            override fun onComplete(e: DatabaseError?, committed: Boolean, snap: DataSnapshot?) {
+                if (e != null || !committed) { onDone?.invoke(false); return }
+                if (!approve || minutes <= 0) { onDone?.invoke(true); return }
+                addBonusMinutes(code, minutes, onDone)
+            }
+        })
+    }
+
+    /** Adds to today's bonus; a bonus from an earlier day is replaced, not added to. */
+    fun addBonusMinutes(code: String, minutes: Int, onDone: ((Boolean) -> Unit)? = null) {
+        val day = today()
+        root(code).child("policy").runTransaction(object : Transaction.Handler {
+            override fun doTransaction(d: MutableData): Transaction.Result {
+                val date = d.child("bonusDate").getValue(String::class.java) ?: ""
+                val current = if (date == day) d.child("bonusMinutes").getValue(Int::class.java) ?: 0 else 0
+                d.child("bonusDate").value = day
+                d.child("bonusMinutes").value = (current + minutes).coerceAtMost(12 * 60)
+                return Transaction.success(d)
+            }
+            override fun onComplete(e: DatabaseError?, committed: Boolean, snap: DataSnapshot?) {
+                onDone?.invoke(e == null && committed)
+            }
+        })
+    }
+
+    // ---------- Location timeline ----------
+
+    /** Child side: one point in today's track. Throttling is the caller's job. */
+    fun reportLocationPoint(code: String, lat: Double, lng: Double) {
+        if (code.isBlank()) return
+        root(code).child("reports").child("track").child(today()).push()
+            .setValue(LocPoint(lat, lng, System.currentTimeMillis()))
+    }
+
+    /** Parent side: a day's track, oldest first. */
+    fun listenTrack(code: String, date: String, onData: (List<LocPoint>) -> Unit): ValueEventListener {
+        val ref = root(code).child("reports").child("track").child(date)
+        val l = object : ValueEventListener {
+            override fun onDataChange(s: DataSnapshot) {
+                onData(s.children.mapNotNull { it.getValue(LocPoint::class.java) }.sortedBy { it.ts })
+            }
+            override fun onCancelled(e: DatabaseError) {
+                Log.e(TAG, "DB Error [track/$code/$date]: ${e.message}")
+            }
+        }
+        ref.addValueEventListener(l)
+        return l
+    }
+
+    /** Keeps the last [days] days of track and drops older ones (free-plan storage). */
+    fun trimTrack(code: String, days: Int = 7) {
+        val cal = java.util.Calendar.getInstance().apply { add(java.util.Calendar.DAY_OF_YEAR, -days) }
+        val cutoff = java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.US).format(cal.time)
+        val ref = root(code).child("reports").child("track")
+        ref.orderByKey().endAt(cutoff).get().addOnSuccessListener { s ->
+            s.children.forEach { it.ref.removeValue() }
+        }
     }
 }

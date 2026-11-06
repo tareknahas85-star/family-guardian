@@ -17,6 +17,10 @@
           }
         },
 
+        "requests": {
+          ".indexOn": ["ts"]
+        },
+
         "pairingOpenUntil": {
           ".write":    "auth != null && !data.parent().exists() && newData.parent().child('owner').val() === auth.uid",
           ".validate": "newData.isNumber() && newData.val() <= now + 3600000 && (!newData.parent().child('owner').exists() || newData.parent().child('owner').val() === auth.uid)"

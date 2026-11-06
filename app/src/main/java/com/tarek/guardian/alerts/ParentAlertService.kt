@@ -1,5 +1,6 @@
 package com.tarek.guardian.alerts
 
+import com.tarek.guardian.L10n
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
@@ -14,6 +15,7 @@ import com.tarek.guardian.Prefs
 import com.tarek.guardian.R
 import com.tarek.guardian.data.ActivityEvent
 import com.tarek.guardian.data.Alert
+import com.tarek.guardian.data.ChildRequest
 import com.tarek.guardian.data.FirebaseRepo
 import com.tarek.guardian.data.Policy
 import com.tarek.guardian.ui.RoleSelectActivity
@@ -62,9 +64,27 @@ class ParentAlertService : Service() {
                     migrateToNotifyAllOnce(p)
                 }
                 FirebaseRepo.listenEvents(code) { e -> onEvent(e) }
+                FirebaseRepo.listenRequests(code) { list -> onRequests(list) }
             }
         }
         return START_STICKY
+    }
+
+    /** Request ids already shown, so a list refresh does not re-buzz. */
+    private val shownRequests = HashSet<String>()
+
+    private fun onRequests(list: List<ChildRequest>) {
+        for (r in list) {
+            if (r.status != ChildRequest.PENDING) {
+                // Answered somewhere else (the app, or the other parent): clear it.
+                if (shownRequests.remove(r.id)) RequestNotifier.cancel(this, r.id)
+                continue
+            }
+            if (r.id in shownRequests) continue
+            if (r.ts < startedAt - REQUEST_BACKLOG_MS) continue
+            shownRequests.add(r.id)
+            RequestNotifier.show(this, r)
+        }
     }
 
     /** Types the parent asked to be notified about. Everything is still logged. */
@@ -111,8 +131,8 @@ class ParentAlertService : Service() {
             PendingIntent.FLAG_IMMUTABLE
         )
         return NotificationCompat.Builder(this, App.CH_MONITOR)
-            .setContentTitle("Family Guardian")
-            .setContentText("Watching for alerts")
+            .setContentTitle(L10n.s(R.string.app_name))
+            .setContentText(L10n.s(R.string.notif_watching))
             .setSmallIcon(R.drawable.ic_notification)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_MIN)
@@ -128,6 +148,8 @@ class ParentAlertService : Service() {
 
         /** Alerts from the last minute still pop up, to cover a restart. */
         private const val GRACE_MS = 60_000L
+        /** Pending requests younger than this still buzz when the service (re)starts. */
+        private const val REQUEST_BACKLOG_MS = 6 * 60 * 60 * 1000L
 
         fun start(ctx: Context) {
             val code = Prefs.getPairCode(ctx)

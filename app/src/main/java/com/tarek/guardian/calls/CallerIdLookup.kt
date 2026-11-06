@@ -1,5 +1,7 @@
 package com.tarek.guardian.calls
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -123,5 +125,5 @@ object CallerIdLookup {
      * contact name, else a plain "unknown" marker.
      */
     fun bestEffortLabel(ctx: Context, number: String?): String =
-        localName(ctx, number) ?: "Unknown"
+        localName(ctx, number) ?: L10n.s(R.string.unknown)
 }

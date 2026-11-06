@@ -1,5 +1,6 @@
 package com.tarek.guardian.monitor
 
+import com.tarek.guardian.L10n
 import com.tarek.guardian.data.ScheduleRule
 import java.util.Calendar
 
@@ -44,6 +45,13 @@ object ScheduleEvaluator {
     }
 
     /** "22:00" for 1320. */
+    /** Built-in rules are shown in the app's language; custom names as typed. */
+    fun ruleName(r: ScheduleRule): String = when (r.id) {
+        "bedtime" -> L10n.s(com.tarek.guardian.R.string.bedtime)
+        "study"   -> L10n.s(com.tarek.guardian.R.string.study_time)
+        else      -> r.name
+    }
+
     fun formatMinute(minuteOfDay: Int): String {
         val h = (minuteOfDay / 60) % 24
         val m = minuteOfDay % 60

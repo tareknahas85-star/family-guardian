@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
+        L10n.init(this)
         LocaleManager.restore(this)
 
         // ── Notification channels ─────────────────────────────────────────────
@@ -26,25 +27,31 @@ class App : Application() {
 
             // Background monitoring (low priority — persistent foreground notification)
             nm.createNotificationChannel(
-                NotificationChannel(CH_MONITOR, "Supervision", NotificationManager.IMPORTANCE_LOW)
+                NotificationChannel(CH_MONITOR, L10n.s(R.string.ch_supervision), NotificationManager.IMPORTANCE_LOW)
             )
             // VPN / internet filter indicator (min priority)
             nm.createNotificationChannel(
-                NotificationChannel(CH_VPN, "Internet filter", NotificationManager.IMPORTANCE_MIN)
+                NotificationChannel(CH_VPN, L10n.s(R.string.ch_filter), NotificationManager.IMPORTANCE_MIN)
             )
             // Live feed — ordinary activity. DEFAULT rather than HIGH so a busy
             // child does not produce a stream of heads-up popovers; the parent can
             // still raise it per-channel in system settings.
             nm.createNotificationChannel(
-                NotificationChannel(CH_ACTIVITY, "Activity", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                    description = "What happens on the child device"
+                NotificationChannel(CH_ACTIVITY, L10n.s(R.string.ch_activity), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                    description = L10n.s(R.string.ch_activity_desc)
                     setShowBadge(true)
                 }
             )
             // Parent alerts — high priority, heads-up style
             nm.createNotificationChannel(
-                NotificationChannel(CH_ALERTS, "Alerts", NotificationManager.IMPORTANCE_HIGH).apply {
-                    description = "Instant alerts for the parent"
+                NotificationChannel(CH_ALERTS, L10n.s(R.string.ch_alerts), NotificationManager.IMPORTANCE_HIGH).apply {
+                    description = L10n.s(R.string.ch_alerts_desc)
+                }
+            )
+            // Child's requests for more time / task rewards — answered from the shade.
+            nm.createNotificationChannel(
+                NotificationChannel(CH_REQUESTS, L10n.s(R.string.ch_requests), NotificationManager.IMPORTANCE_HIGH).apply {
+                    description = L10n.s(R.string.ch_requests_desc)
                 }
             )
         }
@@ -72,5 +79,6 @@ class App : Application() {
         const val CH_VPN     = "vpn_filter"
         const val CH_ALERTS  = "alerts"          // high-priority parent notifications
         const val CH_ACTIVITY = "activity"       // ordinary live-feed events
+        const val CH_REQUESTS = "requests"       // child asks for time / rewards
     }
 }

@@ -1,5 +1,7 @@
 package com.tarek.guardian.widget
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 import android.content.Intent
 import android.os.Build
 import android.service.quicksettings.TileService
@@ -18,7 +20,7 @@ class LangTileService : TileService() {
             else -> LocaleManager.EN
         }
         LocaleManager.apply(tag)
-        Toast.makeText(this, "Language: $tag", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, L10n.s(R.string.lang_toast, tag.ifBlank { L10n.s(R.string.lang_system) }), Toast.LENGTH_SHORT).show()
         updateTile()
     }
 
@@ -28,11 +30,11 @@ class LangTileService : TileService() {
 
     private fun updateTile() {
         val tile = qsTile ?: return
-        tile.label = "Language"
+        tile.label = L10n.s(R.string.language)
         tile.contentDescription = when (LocaleManager.current(this)) {
-            LocaleManager.EN -> "English"
+            LocaleManager.EN -> L10n.s(R.string.lang_en)
             LocaleManager.AR -> "العربية"
-            else -> "System"
+            else -> L10n.s(R.string.lang_system)
         }
         tile.state = android.service.quicksettings.Tile.STATE_ACTIVE
         tile.updateTile()

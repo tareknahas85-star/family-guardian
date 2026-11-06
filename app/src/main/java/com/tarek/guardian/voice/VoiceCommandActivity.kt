@@ -1,5 +1,7 @@
 package com.tarek.guardian.voice
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
@@ -34,9 +36,9 @@ class VoiceCommandActivity : AppCompatActivity() {
                 if (spoken.contains("حارس") || spoken.contains("family") || spoken.contains("sos")) {
                     val code = Prefs.getPairCode(this@VoiceCommandActivity)
                     if (code.isNullOrBlank()) {
-                        Toast.makeText(this@VoiceCommandActivity, "SOS unavailable — device not paired", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@VoiceCommandActivity, L10n.s(R.string.sos_unpaired), Toast.LENGTH_LONG).show()
                     } else {
-                        Toast.makeText(this@VoiceCommandActivity, "SOS triggered — alerting parent", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@VoiceCommandActivity, L10n.s(R.string.sos_triggered), Toast.LENGTH_LONG).show()
                         SosReporter.trigger(this@VoiceCommandActivity, code)
                     }
                 }

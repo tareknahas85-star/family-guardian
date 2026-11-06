@@ -3,29 +3,419 @@
     <string name="admin_description">Allows the parent to protect this device: prevent uninstall, lock, and enforce limits.</string>
     <string name="accessibility_label">Family Guardian — App Guard</string>
     <string name="accessibility_description">Used to enforce app blocking and screen-time limits on the child device.</string>
+    <string name="admin_disable_warning">Removing supervision requires the parent.</string>
+    <string name="label_voice_sos">Voice SOS</string>
+    <string name="label_about">About</string>
+    <string name="label_language">Language</string>
+    <string name="label_sos_widget">SOS — Family Guardian</string>
 
+    <!-- Generic -->
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="send">Send</string>
+    <string name="saved">Saved</string>
+    <string name="retry">Retry</string>
+    <string name="approve">Approve</string>
+    <string name="deny">Deny</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="clear">Clear</string>
+    <string name="off">Off</string>
+    <string name="unknown">Unknown</string>
+    <string name="change">Change</string>
+    <string name="everything">Everything</string>
+    <string name="nothing_yet">Nothing yet</string>
+    <string name="fmt_h_m">%1$dh %2$dm</string>
+    <string name="fmt_m">%1$dm</string>
+    <string name="fmt_10min">10 min</string>
+    <string name="fmt_6h">6 h</string>
+    <string name="fmt_8h">8h</string>
+    <string name="unit_m">m</string>
+    <string name="ago_now">just now</string>
+    <plurals name="ago_min"><item quantity="one">%d min ago</item><item quantity="other">%d min ago</item></plurals>
+    <plurals name="ago_hour"><item quantity="one">%d h ago</item><item quantity="other">%d h ago</item></plurals>
+    <plurals name="ago_day"><item quantity="one">%d day ago</item><item quantity="other">%d days ago</item></plurals>
+
+    <!-- Role select -->
     <string name="role_title">Who uses this device?</string>
     <string name="role_parent">I am the parent</string>
     <string name="role_child">This is the child\'s device</string>
     <string name="child_notice">This device is supervised by a parent using Family Guardian.</string>
     <string name="pair_code">Pairing code</string>
 
-    <!-- Bottom navigation. -->
+    <!-- Bottom navigation -->
     <string name="tab_dashboard">Dashboard</string>
     <string name="tab_activity">Activity</string>
     <string name="tab_live">Live</string>
     <string name="tab_settings">Settings</string>
 
-    <!-- Pairing feedback -->
+    <!-- Pairing -->
     <string name="pair_opening">Opening the pairing window…</string>
     <string name="pair_window_open">The child device can join for the next 15 minutes.\n\nOn the child phone enter exactly this code: %1$s</string>
     <string name="pair_window_failed">Could not open the pairing window.\n\n%1$s</string>
     <string name="code_creating">Creating your pairing code…</string>
     <string name="code_create_failed">Could not create a pairing code.\n\n%1$s</string>
-    <string name="retry">Retry</string>
     <string name="pair_in_progress">Pairing…</string>
     <string name="pair_failed_child">Pairing failed.\n\n%1$s</string>
     <string name="pair_err_denied">The server refused. Either the code is wrong, or the pairing window is closed. On the parent phone tap \"Open pairing window\", then retry within 15 minutes using the exact code shown there.</string>
     <string name="pair_err_timeout">No answer from the server. Check the internet connection on this phone. If it is online, the app\'s Firebase setup (google-services.json) is likely pointing at the wrong database.</string>
     <string name="pair_err_auth">Sign-in to Firebase failed. Anonymous sign-in must be enabled in the Firebase console (Authentication → Sign-in method → Anonymous).</string>
+    <string name="pair_invalid_code">Invalid code</string>
+    <string name="pair_done">Paired — code: %1$s</string>
+    <string name="pair_current">Currently paired to code: %1$s</string>
+    <string name="pair_first">Pair the device first</string>
+    <string name="db_unreachable">Cannot reach the database. Check the connection, that Anonymous sign-in is enabled in Firebase, and that the rules were published.</string>
+
+    <!-- Header / main -->
+    <string name="header_alerts_off">alerts off</string>
+    <string name="cd_notifications">Notifications</string>
+    <string name="internet_open_for">Internet open for %1$s — it re-blocks itself after that</string>
+    <string name="open_notif_settings_hint">Open Settings > Apps > Family Guardian > Notifications</string>
+    <string name="battery_already_ok">Battery is already unrestricted</string>
+    <string name="open_battery_hint">Open Settings > Battery > Unrestricted</string>
+
+    <!-- Child setup -->
+    <string name="child_device">Child device</string>
+    <string name="child_version">v%1$s — Child device</string>
+    <string name="pairing">Pairing</string>
+    <string name="pair_device">Pair device</string>
+    <string name="remote_status">Remote control status</string>
+    <string name="permission_steps">Permission steps</string>
+    <string name="step_usage">1) Usage access</string>
+    <string name="step_accessibility">2) Accessibility service (app blocking)</string>
+    <string name="step_overlay">3) Display over other apps</string>
+    <string name="step_runtime">4) Location + calls + contacts + notifications</string>
+    <string name="step_admin">5) Enable device admin</string>
+    <string name="step_vpn">6) Start the internet filter</string>
+    <string name="step_calls">7) Call filtering permission</string>
+    <string name="step_autostart">8) Allow background activity (important on Huawei/Xiaomi/Oppo/Vivo)</string>
+    <string name="step_autostart_hint">Some phone brands freeze this app\'s connection in the background even when everything above is set up correctly — remote lock and internet blocking then silently stop working. This step fixes that.</string>
+    <string name="sos_button">🆘  SOS</string>
+    <string name="sos_button_hint">Sends your location and an instant alert to your parent</string>
+    <string name="call_filtering_status">Call filtering: %1$s</string>
+    <string name="child_admin_ok">✓ Device Admin: active</string>
+    <string name="child_admin_bad">✗ Device Admin: NOT active — tap step 5 below</string>
+    <string name="child_vpn_ok">✓ Internet filter: ready</string>
+    <string name="child_vpn_bad">✗ Internet filter: NOT set up — tap step 6 below</string>
+    <string name="child_acc_ok">✓ App blocking: active</string>
+    <string name="child_acc_bad">✗ App blocking: NOT active — tap step 2 below</string>
+    <string name="protect_owner">Device Owner — uninstall blocked</string>
+    <string name="protect_admin">Device Admin only — can still be removed after disabling admin. For full protection provision as Device Owner (see docs/SETUP.md).</string>
+    <string name="protect_none">No protection active — enable Device Admin (step 5)</string>
+    <string name="sos_confirm_title">Send SOS?</string>
+    <string name="sos_confirm_body">An alert and your location will be sent to your parent immediately.</string>
+    <string name="sos_sent">SOS sent</string>
+    <string name="sos_sent_parent">SOS sent — parent alerted</string>
+    <string name="sos_unpaired">SOS unavailable — device not paired</string>
+    <string name="sos_triggered">SOS triggered — alerting parent</string>
+    <string name="admin_explanation">Enable parental supervision</string>
+    <string name="autostart_fallback">Open Settings → Battery → find Family Guardian → allow background activity / autostart</string>
+    <string name="call_role_unsupported">Not supported (needs Android 10+)</string>
+    <string name="call_role_unavailable">Not available on this device</string>
+    <string name="call_role_active">Active</string>
+    <string name="call_role_inactive">Not active — tap to enable</string>
+
+    <!-- Dashboard -->
+    <string name="notif_off_title">Notifications are off</string>
+    <string name="notif_off_body">SOS and unknown callers will not reach you.</string>
+    <string name="notif_turn_on">Turn notifications on</string>
+    <string name="notif_stop_doze">Stop Android freezing alerts</string>
+    <string name="current_location">Current location</string>
+    <string name="daily_screen_time">Daily screen time</string>
+    <string name="waiting_child">Waiting for the child device…</string>
+    <string name="not_connected">Not connected</string>
+    <string name="open_map">Open map</string>
+    <string name="locate_now">Locate now</string>
+    <string name="open_pairing_window">Open pairing window (15 min)</string>
+    <string name="quick_actions">Quick actions</string>
+    <string name="lock">Lock</string>
+    <string name="unlock">Unlock</string>
+    <string name="pause_internet">Pause internet</string>
+    <string name="resume">Resume</string>
+    <string name="temp_internet">Temporary internet</string>
+    <string name="duration">Duration</string>
+    <string name="open_internet_temp">Open internet temporarily</string>
+    <string name="todays_activity">Today\'s activity</string>
+    <string name="nothing_today">Nothing yet today</string>
+    <string name="send_test_notif">Send a test notification</string>
+    <string name="lock_sent">Lock sent</string>
+    <string name="unlock_sent">Unlock sent</string>
+    <string name="internet_paused">Internet paused</string>
+    <string name="internet_resumed">Internet resumed</string>
+    <string name="locating_child">Asking for a fresh position</string>
+    <string name="test_alert_title">Test alert</string>
+    <string name="test_alert_body">If you can see this, alerts are working.</string>
+    <string name="test_sent">Sent — check your notifications</string>
+    <string name="test_blocked">Blocked. Notifications are off for this app.</string>
+    <string name="net_timer_running">Internet is open — %1$s left, then it re-blocks itself</string>
+    <string name="net_timer_idle">Grant a bounded internet window; it turns off by itself when time is up.</string>
+    <string name="cannot_connect">Cannot connect</string>
+    <string name="not_paired_yet">Not paired yet</string>
+    <string name="no_location_yet">No location yet</string>
+    <string name="updated_ago">Updated %1$s</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+    <string name="limit_x">Limit %1$s</string>
+    <string name="no_daily_limit">No daily limit set</string>
+    <string name="time_left">%1$s left</string>
+    <string name="time_over">over by %1$s</string>
+    <string name="no_usage_long">No usage data yet.\n\nIf the phone has been in use, Usage Access is probably not granted. On the child phone, open the app and use button 1.</string>
+    <string name="enter_code_hint">Enter the code on the child phone while the window is open.</string>
+    <string name="online_now">Online now</string>
+    <plurals name="last_seen_min"><item quantity="one">Last seen %d min ago</item><item quantity="other">Last seen %d min ago</item></plurals>
+    <plurals name="last_seen_hour"><item quantity="one">Last seen %d h ago — check battery settings</item><item quantity="other">Last seen %d h ago — check battery settings</item></plurals>
+    <plurals name="offline_days"><item quantity="one">Offline for %d day</item><item quantity="other">Offline for %d days</item></plurals>
+    <string name="dash_admin_ok">✓ Device Admin: active</string>
+    <string name="dash_admin_bad">✗ Device Admin: NOT active — check Setup on the child\'s phone</string>
+    <string name="dash_vpn_ok">✓ Internet blocking: ready</string>
+    <string name="dash_vpn_bad">✗ Internet blocking: needs setup — check Setup on the child\'s phone</string>
+    <string name="dash_acc_ok">✓ App blocking: active</string>
+    <string name="dash_acc_bad">✗ App blocking: NOT active — check Setup on the child\'s phone (step 2)</string>
+    <string name="no_zones_set">No safe zones set.</string>
+    <plurals name="zones_summary"><item quantity="one">%1$d safe zone: %2$s</item><item quantity="other">%1$d safe zones: %2$s</item></plurals>
+    <string name="no_position_yet">No position reported yet</string>
+    <string name="map_label_child">Child</string>
+
+    <!-- Activity tab -->
+    <string name="today">Today</string>
+    <string name="no_usage_yet">No usage data yet</string>
+    <string name="time_rules">Time rules</string>
+    <string name="no_time_rules">No time rules set</string>
+    <string name="app_usage">App usage</string>
+    <string name="alerts_and_calls">Alerts and calls</string>
+    <string name="no_usage_grant">No usage data yet. Grant Usage Access on the child phone (button 1).</string>
+    <plurals name="apps_used_today"><item quantity="one">%d app used today</item><item quantity="other">%d apps used today</item></plurals>
+    <string name="no_rules_hint">No time rules set. Add bedtime or study time from Settings.</string>
+    <string name="rule_locks_phone">locks phone</string>
+    <string name="rule_no_internet">no internet</string>
+    <string name="rule_apps_only">apps only</string>
+    <string name="rule_active">● ACTIVE  </string>
+
+    <!-- Live tab -->
+    <string name="notify_me_about">Notify me about</string>
+    <string name="notify_nothing">Nothing. Events are logged below but your phone stays quiet.</string>
+    <string name="feed_off">Recording is off. Turn the activity feed on in Settings.</string>
+    <string name="feed_pair_first">Nothing yet — pair the child device first.</string>
+    <string name="feed_need_acc">Nothing yet. App opens need the Accessibility service on the child phone (button 2).</string>
+    <plurals name="recent_events"><item quantity="one">%d recent event</item><item quantity="other">%d recent events</item></plurals>
+
+    <!-- Settings tab -->
+    <string name="call_filtering">Call filtering</string>
+    <string name="call_off">Off — all calls ring</string>
+    <string name="call_block_unknown">Block numbers not saved in contacts</string>
+    <string name="call_whitelist">Only my allowed numbers — block everything else</string>
+    <string name="call_outgoing_too">Apply to outgoing calls too</string>
+    <string name="always_ring">Always ring — never blocked, whatever the mode</string>
+    <string name="one_number_per_line">One number per line</string>
+    <string name="also_allowed">Also allowed</string>
+    <string name="always_blocked">Always blocked</string>
+    <string name="save_numbers">Save numbers</string>
+    <string name="restrictions">Restrictions</string>
+    <string name="disable_camera">Disable camera</string>
+    <string name="sos_on_child">SOS button on child device</string>
+    <string name="weekly_report">Weekly report</string>
+    <string name="record_feed">Record the live activity feed</string>
+    <string name="record_feed_hint">Choose which events notify you in the Live tab.</string>
+    <string name="daily_limit">Daily screen time limit</string>
+    <string name="lock_at_limit">Lock the phone when the limit is reached</string>
+    <string name="apps_on_child">Apps on the child phone</string>
+    <string name="search_apps">Search apps</string>
+    <string name="alerts">Alerts</string>
+    <string name="notification_settings">Notification settings</string>
+    <string name="safe_zones">Safe zones</string>
+    <string name="name">Name</string>
+    <string name="add_zone_here">Add zone at my location</string>
+    <string name="remove_all_zones">Remove all zones</string>
+    <string name="add_bedtime">Add bedtime 22:00–07:00</string>
+    <string name="add_study">Add study time 16:00–18:00</string>
+    <string name="remove_all_rules">Remove all rules</string>
+    <string name="language">Language</string>
+    <string name="lang_system">System</string>
+    <string name="lang_en">English</string>
+    <string name="lang_ar">العربية</string>
+    <string name="about">About</string>
+    <string name="alerts_ok">Alerts can reach this phone.</string>
+    <string name="alerts_blocked">Alerts are blocked. SOS and unknown callers will not reach you.</string>
+    <string name="emergency_never_blocked">Emergency numbers are never blocked. </string>
+    <plurals name="priority_count"><item quantity="one">%d number always rings.</item><item quantity="other">%d numbers always ring.</item></plurals>
+    <string name="no_zones_yet">No safe zones yet.</string>
+    <string name="zone_row">%1$s  ·  %2$d m</string>
+    <string name="no_rules_yet">No time rules yet.</string>
+    <string name="saved_check_short">Saved, but check these — they look too short: %1$s</string>
+    <string name="zone_default_name">Zone %1$d</string>
+    <string name="locating">Locating…</string>
+    <string name="no_position">Could not get a position</string>
+    <string name="apps_not_sent">The child device has not sent its app list yet. It reports once an hour.</string>
+    <string name="apps_restricted_of">%1$d restricted of %2$d apps</string>
+    <string name="apps_matching">%1$d matching</string>
+    <string name="app_restricted">Restricted</string>
+    <string name="app_limit_day">Limit: %1$s/day</string>
+    <string name="app_allowed">Allowed</string>
+    <string name="app_limit_btn">Limit: %1$s</string>
+    <string name="set_limit">Set limit</string>
+    <string name="limit">Limit</string>
+    <string name="apps_more">…and %1$d more. Use the search box.</string>
+    <string name="no_limit">No limit</string>
+    <string name="custom">Custom…</string>
+    <string name="daily_limit_for">Daily limit — %1$s</string>
+    <string name="minutes_per_day">Minutes per day</string>
+
+    <!-- Call modes -->
+    <string name="mode_block_unknown">Block numbers not in contacts</string>
+    <string name="mode_whitelist">Only my allowed numbers</string>
+
+    <!-- Event labels -->
+    <string name="ev_app_opened">App opened</string>
+    <string name="ev_app_blocked">Blocked app attempt</string>
+    <string name="ev_app_installed">App installed</string>
+    <string name="ev_app_uninstalled">App removed</string>
+    <string name="ev_unlock">Phone unlocked</string>
+    <string name="ev_screen_on">Screen on</string>
+    <string name="ev_screen_off">Screen off</string>
+    <string name="ev_call">Call</string>
+    <string name="ev_power">Charger</string>
+    <string name="ev_internet">Internet changed</string>
+    <string name="ev_limit">Time limit reached</string>
+    <string name="ev_boot">Phone restarted</string>
+    <string name="ev_pin">Tried to pin an app</string>
+    <string name="ev_tamper">Protection turned off</string>
+    <string name="ev_request">Asked for more time</string>
+    <string name="ev_charger_in">Charger plugged in</string>
+    <string name="ev_charger_out">Charger unplugged</string>
+    <string name="ev_new_app">New app installed</string>
+    <string name="ev_app_updated">App updated</string>
+    <string name="ev_tried_blocked">Tried to open a blocked app</string>
+
+    <!-- Child-side alerts & notifications -->
+    <string name="blocked_by_parent">Blocked by parent</string>
+    <string name="call_blocked">Call blocked</string>
+    <string name="unknown_caller">Unknown caller</string>
+    <string name="call_incoming">incoming</string>
+    <string name="call_outgoing">outgoing</string>
+    <string name="withheld">Withheld</string>
+    <string name="zone_left_title">Left %1$s</string>
+    <string name="zone_left_body">Left the safe zone</string>
+    <string name="zone_arrived_title">Arrived at %1$s</string>
+    <string name="zone_arrived_body">Entered the safe zone</string>
+    <string name="sos_title">🆘 SOS</string>
+    <string name="sos_body">SOS pressed on %1$s</string>
+    <string name="sos_location_title">🆘 SOS location</string>
+    <string name="bedtime">Bedtime</string>
+    <string name="study_time">Study time</string>
+    <string name="net_timer_ended">Internet timer ended</string>
+    <string name="net_auto_reblocked">Auto re-blocked</string>
+    <string name="limit_used_up">Daily screen time used up</string>
+    <string name="limit_budget_was">Budget was %1$d min</string>
+    <string name="pin_with_app">Tried to pin \"%1$s\" open. The screen was locked automatically.</string>
+    <string name="pin_generic">Screen pinning was detected. The screen was locked automatically.</string>
+    <string name="cant_lock_title">Couldn\'t lock the phone</string>
+    <string name="cant_lock_body">Device Admin isn\'t active on the child\'s phone. Open Family Guardian there → Setup → \"Enable Device Admin\".</string>
+    <string name="cant_net_title">Couldn\'t turn off internet</string>
+    <string name="cant_net_body">VPN permission isn\'t granted on the child\'s phone. Open Family Guardian there → Setup → \"Start VPN\" and accept the prompt.</string>
+    <string name="notif_supervised">Supervised device</string>
+    <string name="notif_watching">Watching for alerts</string>
+    <string name="notif_internet_off">Internet is off</string>
+    <string name="notif_filtering">Safe browsing is on</string>
+    <string name="alert_generic">Alert</string>
+    <string name="new_message">New message</string>
+    <string name="action_map">Map</string>
+    <string name="action_who">Who is this?</string>
+    <string name="action_call">Call</string>
+    <string name="ch_supervision">Supervision</string>
+    <string name="ch_filter">Internet filter</string>
+    <string name="ch_activity">Activity</string>
+    <string name="ch_activity_desc">What happens on the child device</string>
+    <string name="ch_alerts">Alerts</string>
+    <string name="ch_alerts_desc">Instant alerts for the parent</string>
+    <string name="ch_requests">Requests</string>
+    <string name="ch_requests_desc">Extra-time and reward requests from the child</string>
+    <string name="weekly_title">Weekly report — %1$s</string>
+    <string name="weekly_total">Total screen time: %1$s</string>
+    <string name="weekly_avg">Daily average: %1$s</string>
+    <string name="weekly_top">Most used:</string>
+    <string name="screenshot_uploading">Screenshot captured — uploading…</string>
+    <string name="lang_toast">Language: %1$s</string>
+    <string name="panic_triggered">PANIC — SOS triggered</string>
+
+    <!-- About -->
+    <string name="parent">Parent</string>
+    <string name="role_parent_suffix">%1$s — Parent</string>
+    <string name="e_signature">E-signature</string>
+    <string name="sign_here">✍  Sign here</string>
+    <string name="cd_app_icon">App icon</string>
+    <string name="cd_saved_signature">Saved signature</string>
+    <string name="contact">Contact</string>
+    <string name="draw_signature_first">Please draw your signature first</string>
+    <string name="signature_saved">Signature saved ✓</string>
+    <string name="signature_restored">Default signature restored</string>
+    <string name="no_app_for_link">No app can open this link</string>
+    <string name="cd_sos">SOS emergency button — sends alert to parent with location</string>
+
+    <!-- Tamper alerts -->
+    <string name="tamper_title">⚠ Protection turned off</string>
+    <string name="tamper_body">Something was switched off on the child\'s phone:\n%1$s\n\nOpen Family Guardian there and turn it back on.</string>
+    <string name="tamper_admin">Device admin (uninstall protection)</string>
+    <string name="tamper_vpn">Internet filter (VPN)</string>
+    <string name="tamper_acc">App blocking (Accessibility)</string>
+    <string name="tamper_admin_attempt">Someone opened the screen to remove device admin — the first step to uninstalling the app</string>
+
+    <!-- Extra time & rewards — child -->
+    <string name="child_time_title">My screen time</string>
+    <string name="ask_more_time">Ask for more time</string>
+    <string name="my_tasks">Tasks to earn time</string>
+    <string name="no_tasks_child">No tasks yet. Your parent can add some.</string>
+    <string name="request_already_waiting">You already asked — wait for your parent to answer.</string>
+    <string name="request_sent">Sent to your parent</string>
+    <string name="request_failed">Could not send. Check the internet.</string>
+    <string name="child_no_limit">No daily limit today.</string>
+    <string name="child_time_left">Time left today: %1$s</string>
+    <string name="child_bonus_today">Includes %1$s extra from your parent</string>
+    <string name="request_waiting">Waiting for an answer: %1$s</string>
+    <string name="request_approved">✓ Approved: %1$s</string>
+    <string name="request_denied">✗ Not this time: %1$s</string>
+    <string name="task_reward">Earns %1$s</string>
+    <string name="task_waiting">Waiting…</string>
+    <string name="task_done">I did it ✓</string>
+    <string name="request_task_label">%1$s (%2$s)</string>
+    <string name="request_time_label">%1$s more</string>
+    <string name="time_up_title">Your screen time is up</string>
+    <string name="time_up_body">Tap to ask your parent for more time.</string>
+
+    <!-- Extra time & rewards — parent -->
+    <string name="requests_title">Waiting for you</string>
+    <string name="req_time_title">Asking for more time</string>
+    <string name="req_task_title">Task done</string>
+    <string name="req_time_body">Wants %1$s more screen time</string>
+    <string name="req_task_body">Says they did \"%1$s\" — reward %2$s</string>
+    <string name="request_decide_failed">Could not save the answer. Check the internet.</string>
+    <string name="request_approved_toast">Approved — the time was added</string>
+    <string name="request_denied_toast">Denied</string>
+    <string name="bonus_today">+%1$s today</string>
+    <string name="rewards_title">Rewards</string>
+    <string name="rewards_hint">Tasks your child can do to earn extra screen time. When they tap \"I did it\", you approve or deny.</string>
+    <string name="task_title_hint">Task, e.g. Homework</string>
+    <string name="task_minutes_hint">Minutes</string>
+    <string name="add_task">Add task</string>
+    <string name="task_need_title">Write the task first</string>
+    <string name="no_tasks_parent">No tasks yet.</string>
+
+    <!-- Safe browsing -->
+    <string name="safe_browsing">Safe browsing</string>
+    <string name="safe_browsing_hint">Blocks adult and gambling sites, forces SafeSearch on Google and Bing and Restricted Mode on YouTube. Uses the free CleanBrowsing family filter.</string>
+
+    <!-- Second parent -->
+    <string name="second_parent_title">Another parent</string>
+    <string name="second_parent_hint">To add the other parent: install the app on their phone, choose \"I am the parent\" → \"Join the other parent\" and enter %1$s. Tap the button below first — it opens a 15-minute window.</string>
+    <string name="invite_parent">Open the window for the other parent</string>
+    <string name="family_setup_title">Set up this parent phone</string>
+    <string name="family_new">Start a new family</string>
+    <string name="family_join">Join the other parent</string>
+    <string name="family_join_hint">On the other parent\'s phone: Settings → Another parent → open the window. Then enter the code shown there.</string>
+    <string name="family_joined">Joined — you now see the same child</string>
+
+    <!-- Timeline -->
+    <string name="timeline_title">Today\'s places</string>
+    <string name="timeline_empty">No movement recorded today yet.</string>
+    <string name="timeline_route">Show the route on the map</string>
+    <string name="timeline_range">%1$s – %2$s</string>
 </resources>

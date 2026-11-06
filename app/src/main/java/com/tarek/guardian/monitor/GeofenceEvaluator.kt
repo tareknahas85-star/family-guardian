@@ -1,5 +1,7 @@
 package com.tarek.guardian.monitor
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 import android.content.Context
 import android.location.Location
 import com.tarek.guardian.data.Alert
@@ -51,12 +53,12 @@ class GeofenceEvaluator(private val ctx: Context) {
 
             if (!inside && zone.notifyOnExit) {
                 push(code, zone, location, Alert.ZONE_EXIT,
-                    "Left ${zone.name}",
-                    "Left the safe zone")
+                    L10n.s(R.string.zone_left_title, zone.name),
+                    L10n.s(R.string.zone_left_body))
             } else if (inside && zone.notifyOnEnter) {
                 push(code, zone, location, Alert.ZONE_ENTER,
-                    "Arrived at ${zone.name}",
-                    "Entered the safe zone")
+                    L10n.s(R.string.zone_arrived_title, zone.name),
+                    L10n.s(R.string.zone_arrived_body))
             }
         }
     }

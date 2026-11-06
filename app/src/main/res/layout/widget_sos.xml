@@ -16,7 +16,7 @@
         android:textStyle="bold"
         android:textAllCaps="true"
         android:fontFamily="sans-serif-medium"
-        android:contentDescription="SOS emergency button — sends alert to parent with location"
+        android:contentDescription="@string/cd_sos"
         android:layout_gravity="center" />
 
 </FrameLayout>

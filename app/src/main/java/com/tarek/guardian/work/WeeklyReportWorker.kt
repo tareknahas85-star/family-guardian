@@ -1,5 +1,7 @@
 package com.tarek.guardian.work
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 import android.content.Context
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
@@ -53,20 +55,20 @@ class WeeklyReportWorker(
         val top = totals.entries.sortedByDescending { it.value }.take(5)
 
         val body = buildString {
-            append("Total screen time: ${formatDuration(grandTotal)}\n")
-            append("Daily average: ${formatDuration(grandTotal / 7)}\n\n")
-            append("Most used:\n")
+            append(L10n.s(R.string.weekly_total, formatDuration(grandTotal)) + "\n")
+            append(L10n.s(R.string.weekly_avg, formatDuration(grandTotal / 7)) + "\n\n")
+            append(L10n.s(R.string.weekly_top) + "\n")
             top.forEachIndexed { i, (pkg, minutes) ->
                 append("${i + 1}. ${shortName(pkg)} — ${formatDuration(minutes)}\n")
             }
         }
 
-        val end = SimpleDateFormat("d MMM", Locale.US).format(Date())
+        val end = SimpleDateFormat("d MMM", L10n.dateLocale()).format(Date())
         FirebaseRepo.pushAlert(
             code,
             Alert(
                 type = Alert.WEEKLY_REPORT,
-                title = "Weekly report — $end",
+                title = L10n.s(R.string.weekly_title, end),
                 body = body.trim(),
                 ts = System.currentTimeMillis()
             )
@@ -85,11 +87,7 @@ class WeeklyReportWorker(
     private fun shortName(pkg: String): String =
         pkg.substringAfterLast('.').ifBlank { pkg }
 
-    private fun formatDuration(minutes: Int): String {
-        val h = minutes / 60
-        val m = minutes % 60
-        return if (h > 0) "${h}h ${m}m" else "${m}m"
-    }
+    private fun formatDuration(minutes: Int): String = L10n.duration(minutes)
 
     companion object {
         private const val WORK_NAME = "weekly_report"

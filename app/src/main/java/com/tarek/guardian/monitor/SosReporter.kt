@@ -1,5 +1,7 @@
 package com.tarek.guardian.monitor
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -32,9 +34,9 @@ object SosReporter {
             code,
             Alert(
                 type = Alert.SOS,
-                title = "🆘 SOS",
+                title = L10n.s(R.string.sos_title),
                 body = buildString {
-                    append("SOS pressed on $model")
+                    append(L10n.s(R.string.sos_body, model))
                     if (note.isNotBlank()) append("\n$note")
                 },
                 ts = System.currentTimeMillis()
@@ -57,7 +59,7 @@ object SosReporter {
                         code,
                         Alert(
                             type = Alert.SOS,
-                            title = "🆘 SOS location",
+                            title = L10n.s(R.string.sos_location_title),
                             body = "https://maps.google.com/?q=${loc.latitude},${loc.longitude}",
                             lat = loc.latitude,
                             lng = loc.longitude,

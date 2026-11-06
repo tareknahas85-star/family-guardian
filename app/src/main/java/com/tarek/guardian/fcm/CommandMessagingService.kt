@@ -1,5 +1,6 @@
 package com.tarek.guardian.fcm
 
+import com.tarek.guardian.L10n
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
@@ -70,7 +71,7 @@ class CommandMessagingService : FirebaseMessagingService() {
             ?: getString(R.string.app_name)
         val body = message.notification?.body
             ?: message.data["body"]
-            ?: if (role == Prefs.ROLE_PARENT) "New message" else "Alert"
+            ?: L10n.s(if (role == Prefs.ROLE_PARENT) R.string.new_message else R.string.alert_generic)
 
         showAlertNotification(title, body)
     }

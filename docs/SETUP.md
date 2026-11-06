@@ -71,9 +71,15 @@ Copy the APK to both phones and install it. You will have to allow
 
 ## 3) The parent phone
 
-1. Open **Family Guardian** and choose **Parent**.
-2. Write down the 6-letter **pairing code**.
-3. Press **Open pairing window**. You now have 15 minutes to pair the child phone.
+1. Open **Family Guardian** and choose **Parent**, then **Start a new family**.
+2. The app creates your 6-letter **pairing code** on the server and opens a
+   15-minute pairing window by itself. Write the code down.
+3. Pair the child phone within those 15 minutes. Later, **Open pairing window**
+   gives you another 15 minutes.
+
+**A second parent:** on the first parent's phone go to Settings → Another parent
+→ open the window. On the second parent's phone choose **Parent** → **Join the
+other parent** and type the same code.
 
 ---
 

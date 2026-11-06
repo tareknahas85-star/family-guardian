@@ -1,5 +1,7 @@
 package com.tarek.guardian.monitor
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -23,33 +25,33 @@ class DeviceEventReceiver : BroadcastReceiver() {
         val c = ctx ?: return
         when (intent?.action) {
             Intent.ACTION_SCREEN_ON ->
-                EventReporter.record(c, ActivityEvent.SCREEN_ON, "Screen on")
+                EventReporter.record(c, ActivityEvent.SCREEN_ON, L10n.s(R.string.ev_screen_on))
 
             Intent.ACTION_SCREEN_OFF ->
-                EventReporter.record(c, ActivityEvent.SCREEN_OFF, "Screen off")
+                EventReporter.record(c, ActivityEvent.SCREEN_OFF, L10n.s(R.string.ev_screen_off))
 
             // Fires after the keyguard is actually dismissed, so this is a real
             // unlock rather than just the screen waking.
             Intent.ACTION_USER_PRESENT ->
-                EventReporter.record(c, ActivityEvent.UNLOCK, "Phone unlocked")
+                EventReporter.record(c, ActivityEvent.UNLOCK, L10n.s(R.string.ev_unlock))
 
             Intent.ACTION_POWER_CONNECTED ->
-                EventReporter.record(c, ActivityEvent.POWER, "Charger plugged in")
+                EventReporter.record(c, ActivityEvent.POWER, L10n.s(R.string.ev_charger_in))
 
             Intent.ACTION_POWER_DISCONNECTED ->
-                EventReporter.record(c, ActivityEvent.POWER, "Charger unplugged")
+                EventReporter.record(c, ActivityEvent.POWER, L10n.s(R.string.ev_charger_out))
 
             Intent.ACTION_PACKAGE_ADDED -> {
                 val pkg = intent.data?.schemeSpecificPart ?: return
                 // A replace is an update, not a new install.
                 if (intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) return
-                EventReporter.recordApp(c, ActivityEvent.APP_INSTALLED, pkg, "New app installed")
+                EventReporter.recordApp(c, ActivityEvent.APP_INSTALLED, pkg, L10n.s(R.string.ev_new_app))
             }
 
             Intent.ACTION_PACKAGE_FULLY_REMOVED, Intent.ACTION_PACKAGE_REMOVED -> {
                 val pkg = intent.data?.schemeSpecificPart ?: return
                 if (intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) return
-                EventReporter.recordApp(c, ActivityEvent.APP_UNINSTALLED, pkg, "App removed")
+                EventReporter.recordApp(c, ActivityEvent.APP_UNINSTALLED, pkg, L10n.s(R.string.ev_app_uninstalled))
             }
         }
     }

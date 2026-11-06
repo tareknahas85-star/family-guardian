@@ -1,5 +1,7 @@
 package com.tarek.guardian.panic
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
@@ -28,9 +30,9 @@ object PanicTrigger {
                     tapCount.set(0)
                     val code = Prefs.getPairCode(view.context)
                     if (code.isNullOrBlank()) {
-                        Toast.makeText(view.context, "SOS unavailable — device not paired", Toast.LENGTH_LONG).show()
+                        Toast.makeText(view.context, L10n.s(R.string.sos_unpaired), Toast.LENGTH_LONG).show()
                     } else {
-                        Toast.makeText(view.context, "PANIC — SOS triggered", Toast.LENGTH_LONG).show()
+                        Toast.makeText(view.context, L10n.s(R.string.panic_triggered), Toast.LENGTH_LONG).show()
                         SosReporter.trigger(view.context, code)
                     }
                 }

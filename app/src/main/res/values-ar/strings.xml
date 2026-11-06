@@ -1,32 +1,491 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">حارس العيلة</string>
-    <string name="admin_description">اسمح للأهل يحموا هالجهاز: منع الحذف، القفل، وفرض الحدود.</string>
-    <string name="accessibility_label">حارس العيلة — حارس التطبيقات</string>
-    <string name="accessibility_description">بينستخدم لفرض حظر التطبيقات وحدود وقت الشاشة عجهاز الولد.</string>
+    <string name="admin_description">بتخلّي الأهل يحموا هالجهاز: بيمنع حذف التطبيق، بيقفل الشاشة، وبيطبّق الحدود.</string>
+    <string name="accessibility_label">حارس العيلة — حماية التطبيقات</string>
+    <string name="accessibility_description">منستعملها لنحجب التطبيقات ونطبّق حدود وقت الشاشة على جهاز الولد.</string>
+    <string name="admin_disable_warning">لتشيل الرقابة لازم الأهل يوافقوا.</string>
+    <string name="label_voice_sos">استغاثة بالصوت</string>
+    <string name="label_about">عن التطبيق</string>
+    <string name="label_language">اللغة</string>
+    <string name="label_sos_widget">استغاثة — حارس العيلة</string>
 
-    <string name="role_title">مين عم يستخدم هالجهاز؟</string>
-    <string name="role_parent">أنا الأب/الأم</string>
+    <!-- Generic -->
+    <string name="cancel">إلغاء</string>
+    <string name="save">حفظ</string>
+    <string name="send">بعات</string>
+    <string name="saved">انحفظ</string>
+    <string name="retry">جرّب مرة تانية</string>
+    <string name="approve">وافق</string>
+    <string name="deny">ارفض</string>
+    <string name="delete">امسح</string>
+    <string name="edit">عدّل</string>
+    <string name="clear">فضّي</string>
+    <string name="off">مطفي</string>
+    <string name="unknown">مو معروف</string>
+    <string name="change">غيّر</string>
+    <string name="everything">كلشي</string>
+    <string name="nothing_yet">لسا ما في شي</string>
+    <string name="fmt_h_m">%1$dس %2$dد</string>
+    <string name="fmt_m">%1$dد</string>
+    <string name="fmt_10min">10 دقايق</string>
+    <string name="fmt_6h">6 ساعات</string>
+    <string name="fmt_8h">8 ساعات</string>
+    <string name="unit_m">م</string>
+    <string name="ago_now">هلأ</string>
+    <plurals name="ago_min">
+        <item quantity="zero">من %d دقيقة</item>
+        <item quantity="one">من دقيقة</item>
+        <item quantity="two">من دقيقتين</item>
+        <item quantity="few">من %d دقايق</item>
+        <item quantity="many">من %d دقيقة</item>
+        <item quantity="other">من %d دقيقة</item>
+    </plurals>
+    <plurals name="ago_hour">
+        <item quantity="zero">من %d ساعة</item>
+        <item quantity="one">من ساعة</item>
+        <item quantity="two">من ساعتين</item>
+        <item quantity="few">من %d ساعات</item>
+        <item quantity="many">من %d ساعة</item>
+        <item quantity="other">من %d ساعة</item>
+    </plurals>
+    <plurals name="ago_day">
+        <item quantity="zero">من %d يوم</item>
+        <item quantity="one">من يوم</item>
+        <item quantity="two">من يومين</item>
+        <item quantity="few">من %d أيام</item>
+        <item quantity="many">من %d يوم</item>
+        <item quantity="other">من %d يوم</item>
+    </plurals>
+
+    <!-- Role select -->
+    <string name="role_title">مين بيستعمل هالجهاز؟</string>
+    <string name="role_parent">أنا الأب أو الأم</string>
     <string name="role_child">هاد جهاز الولد</string>
-    <string name="child_notice">هالجهاز تحت إشراف الأهل عن طريق حارس العيلة.</string>
-    <string name="pair_code">رمز الاقتران</string>
+    <string name="child_notice">هالجهاز تحت رقابة الأهل عن طريق حارس العيلة.</string>
+    <string name="pair_code">رمز الربط</string>
 
-    <!-- Bottom navigation. -->
-    <string name="tab_dashboard">لوحة التحكم</string>
+    <!-- Bottom navigation -->
+    <string name="tab_dashboard">الرئيسية</string>
     <string name="tab_activity">النشاط</string>
     <string name="tab_live">مباشر</string>
     <string name="tab_settings">الإعدادات</string>
 
-    <!-- رسائل الربط -->
+    <!-- Pairing -->
     <string name="pair_opening">عم نفتح نافذة الربط…</string>
-    <string name="pair_window_open">جهاز الولد فيه ينربط خلال الـ15 دقيقة الجاية.\n\nعلى موبايل الولد اكتب هالرمز بالضبط: %1$s</string>
+    <string name="pair_window_open">جهاز الولد فيه ينربط خلال الـ15 دقيقة الجاية.\n\nعلى موبايل الولد اكتب هالرمز بالزبط: %1$s</string>
     <string name="pair_window_failed">ما قدرنا نفتح نافذة الربط.\n\n%1$s</string>
     <string name="code_creating">عم نعمل رمز الربط تبعك…</string>
     <string name="code_create_failed">ما قدرنا نعمل رمز ربط.\n\n%1$s</string>
-    <string name="retry">جرّب مرة تانية</string>
     <string name="pair_in_progress">عم نربط…</string>
     <string name="pair_failed_child">ما زبط الربط.\n\n%1$s</string>
-    <string name="pair_err_denied">السيرفر رفض. يا إما الرمز غلط، يا إما نافذة الربط مسكّرة. على موبايل الأهل اضغط \"فتح نافذة الربط\" وجرّب خلال 15 دقيقة بنفس الرمز اللي طالع هنيك.</string>
-    <string name="pair_err_timeout">ما في رد من السيرفر. تأكد من النت عهالموبايل. إذا النت شغّال، فإعدادات Firebase (google-services.json) غالباً عم تأشّر على قاعدة بيانات غلط.</string>
-    <string name="pair_err_auth">فشل تسجيل الدخول بـ Firebase. لازم يكون Anonymous مفعّل بـ Firebase Console (Authentication ← Sign-in method ← Anonymous).</string>
+    <string name="pair_err_denied">السيرفر رفض. يا إما الرمز غلط، يا إما نافذة الربط مسكّرة. على موبايل الأهل اكبس \"فتح نافذة الربط\" وجرّب خلال 15 دقيقة بنفس الرمز اللي طالع هنيك.</string>
+    <string name="pair_err_timeout">ما في رد من السيرفر. شوف النت عهالموبايل. إذا النت شغّال، فإعدادات Firebase (google-services.json) غالباً عم تأشّر على داتابيز غلط.</string>
+    <string name="pair_err_auth">ما زبط تسجيل الدخول على Firebase. لازم يكون Anonymous مفعّل بـ Firebase Console (Authentication ← Sign-in method ← Anonymous).</string>
+    <string name="pair_invalid_code">الرمز مو صحيح</string>
+    <string name="pair_done">انربط — الرمز: %1$s</string>
+    <string name="pair_current">مربوط هلأ عالرمز: %1$s</string>
+    <string name="pair_first">اربط الجهاز بالأول</string>
+    <string name="db_unreachable">ما عم نقدر نوصل للداتابيز. شوف النت، وإنه Anonymous مفعّل بـ Firebase، وإنه القواعد (Rules) منشورة.</string>
+
+    <!-- Header / main -->
+    <string name="header_alerts_off">الإشعارات مسكّرة</string>
+    <string name="cd_notifications">الإشعارات</string>
+    <string name="internet_open_for">النت مفتوح لمدة %1$s — بعدها بيرجع ينقطع لحاله</string>
+    <string name="open_notif_settings_hint">افتح الإعدادات ← التطبيقات ← حارس العيلة ← الإشعارات</string>
+    <string name="battery_already_ok">البطارية أصلاً مو مقيّدة</string>
+    <string name="open_battery_hint">افتح الإعدادات ← البطارية ← بلا قيود</string>
+
+    <!-- Child setup -->
+    <string name="child_device">جهاز الولد</string>
+    <string name="child_version">v%1$s — جهاز الولد</string>
+    <string name="pairing">الربط</string>
+    <string name="pair_device">اربط الجهاز</string>
+    <string name="remote_status">حالة التحكم عن بعد</string>
+    <string name="permission_steps">خطوات الصلاحيات</string>
+    <string name="step_usage">1) الوصول لبيانات الاستخدام</string>
+    <string name="step_accessibility">2) خدمة إمكانية الوصول (لحجب التطبيقات)</string>
+    <string name="step_overlay">3) الظهور فوق التطبيقات التانية</string>
+    <string name="step_runtime">4) الموقع + المكالمات + جهات الاتصال + الإشعارات</string>
+    <string name="step_admin">5) فعّل مسؤول الجهاز</string>
+    <string name="step_vpn">6) شغّل فلتر النت</string>
+    <string name="step_calls">7) صلاحية فلترة المكالمات</string>
+    <string name="step_autostart">8) اسمح بالشغل بالخلفية (مهم على هواوي/شاومي/أوبو/فيفو)</string>
+    <string name="step_autostart_hint">في ماركات موبايلات بتجمّد اتصال التطبيق بالخلفية حتى لو كل شي فوق مضبوط — وقتها القفل عن بعد وقطع النت بيوقفوا بدون ما تحس. هالخطوة بتحل هالمشكلة.</string>
+    <string name="sos_button">🆘  استغاثة</string>
+    <string name="sos_button_hint">بتبعت موقعك وتنبيه فوري لأهلك</string>
+    <string name="call_filtering_status">فلترة المكالمات: %1$s</string>
+    <string name="child_admin_ok">✓ مسؤول الجهاز: شغّال</string>
+    <string name="child_admin_bad">✗ مسؤول الجهاز: مو شغّال — اكبس الخطوة 5 تحت</string>
+    <string name="child_vpn_ok">✓ فلتر النت: جاهز</string>
+    <string name="child_vpn_bad">✗ فلتر النت: مو مضبوط — اكبس الخطوة 6 تحت</string>
+    <string name="child_acc_ok">✓ حجب التطبيقات: شغّال</string>
+    <string name="child_acc_bad">✗ حجب التطبيقات: مو شغّال — اكبس الخطوة 2 تحت</string>
+    <string name="protect_owner">مالك الجهاز (Device Owner) — حذف التطبيق ممنوع</string>
+    <string name="protect_admin">مسؤول جهاز بس — بينشال إذا حدا سكّر صلاحية المسؤول. لحماية كاملة اعمله Device Owner (شوف docs/SETUP.md).</string>
+    <string name="protect_none">ما في أي حماية شغّالة — فعّل مسؤول الجهاز (الخطوة 5)</string>
+    <string name="sos_confirm_title">بدك تبعت استغاثة؟</string>
+    <string name="sos_confirm_body">رح يوصل تنبيه وموقعك لأهلك فوراً.</string>
+    <string name="sos_sent">انبعتت الاستغاثة</string>
+    <string name="sos_sent_parent">انبعتت الاستغاثة — الأهل وصلهم تنبيه</string>
+    <string name="sos_unpaired">الاستغاثة مو متاحة — الجهاز مو مربوط</string>
+    <string name="sos_triggered">انبعتت الاستغاثة — عم ننبّه الأهل</string>
+    <string name="admin_explanation">فعّل رقابة الأهل</string>
+    <string name="autostart_fallback">افتح الإعدادات ← البطارية ← دوّر على حارس العيلة ← اسمح بالشغل بالخلفية / التشغيل التلقائي</string>
+    <string name="call_role_unsupported">مو مدعوم (بدها أندرويد 10 وفوق)</string>
+    <string name="call_role_unavailable">مو متاحة عهالجهاز</string>
+    <string name="call_role_active">شغّالة</string>
+    <string name="call_role_inactive">مو شغّالة — اكبس لتفعّلها</string>
+
+    <!-- Dashboard -->
+    <string name="notif_off_title">الإشعارات مسكّرة</string>
+    <string name="notif_off_body">الاستغاثة والمتصلين الغريبين ما رح يوصلوك.</string>
+    <string name="notif_turn_on">شغّل الإشعارات</string>
+    <string name="notif_stop_doze">امنع أندرويد يجمّد التنبيهات</string>
+    <string name="current_location">الموقع هلأ</string>
+    <string name="daily_screen_time">وقت الشاشة اليوم</string>
+    <string name="waiting_child">عم نستنى جهاز الولد…</string>
+    <string name="not_connected">مو متصل</string>
+    <string name="open_map">افتح الخريطة</string>
+    <string name="locate_now">حدّد الموقع هلأ</string>
+    <string name="open_pairing_window">افتح نافذة الربط (15 دقيقة)</string>
+    <string name="quick_actions">أوامر سريعة</string>
+    <string name="lock">اقفل</string>
+    <string name="unlock">افتح القفل</string>
+    <string name="pause_internet">اقطع النت</string>
+    <string name="resume">رجّع النت</string>
+    <string name="temp_internet">نت مؤقت</string>
+    <string name="duration">المدة</string>
+    <string name="open_internet_temp">افتح النت لمدة محددة</string>
+    <string name="todays_activity">نشاط اليوم</string>
+    <string name="nothing_today">لسا ما صار شي اليوم</string>
+    <string name="send_test_notif">ابعت إشعار تجربة</string>
+    <string name="lock_sent">انبعت أمر القفل</string>
+    <string name="unlock_sent">انبعت أمر فتح القفل</string>
+    <string name="internet_paused">النت مقطوع</string>
+    <string name="internet_resumed">النت رجع</string>
+    <string name="locating_child">عم نطلب موقع جديد</string>
+    <string name="test_alert_title">تنبيه تجربة</string>
+    <string name="test_alert_body">إذا شايف هالإشعار، يعني التنبيهات شغّالة.</string>
+    <string name="test_sent">انبعت — شوف إشعاراتك</string>
+    <string name="test_blocked">ما انبعت. الإشعارات مسكّرة لهالتطبيق.</string>
+    <string name="net_timer_running">النت مفتوح — باقي %1$s، وبعدها بينقطع لحاله</string>
+    <string name="net_timer_idle">افتح النت لمدة محددة، وبيرجع ينقطع لحاله لما يخلص الوقت.</string>
+    <string name="cannot_connect">ما في اتصال</string>
+    <string name="not_paired_yet">لسا مو مربوط</string>
+    <string name="no_location_yet">لسا ما في موقع</string>
+    <string name="updated_ago">آخر تحديث %1$s</string>
+    <string name="online">متصل</string>
+    <string name="offline">مو متصل</string>
+    <string name="limit_x">الحد %1$s</string>
+    <string name="no_daily_limit">ما في حد يومي</string>
+    <string name="time_left">باقي %1$s</string>
+    <string name="time_over">زاد %1$s</string>
+    <string name="no_usage_long">لسا ما في بيانات استخدام.\n\nإذا الموبايل عم ينستعمل، غالباً صلاحية الوصول لبيانات الاستخدام مو معطاة. على موبايل الولد افتح التطبيق واكبس الزر 1.</string>
+    <string name="enter_code_hint">اكتب الرمز على موبايل الولد والنافذة مفتوحة.</string>
+    <string name="online_now">متصل هلأ</string>
+    <plurals name="last_seen_min">
+        <item quantity="zero">آخر ظهور من %d دقيقة</item>
+        <item quantity="one">آخر ظهور من دقيقة</item>
+        <item quantity="two">آخر ظهور من دقيقتين</item>
+        <item quantity="few">آخر ظهور من %d دقايق</item>
+        <item quantity="many">آخر ظهور من %d دقيقة</item>
+        <item quantity="other">آخر ظهور من %d دقيقة</item>
+    </plurals>
+    <plurals name="last_seen_hour">
+        <item quantity="zero">آخر ظهور من %d ساعة — شوف إعدادات البطارية</item>
+        <item quantity="one">آخر ظهور من ساعة — شوف إعدادات البطارية</item>
+        <item quantity="two">آخر ظهور من ساعتين — شوف إعدادات البطارية</item>
+        <item quantity="few">آخر ظهور من %d ساعات — شوف إعدادات البطارية</item>
+        <item quantity="many">آخر ظهور من %d ساعة — شوف إعدادات البطارية</item>
+        <item quantity="other">آخر ظهور من %d ساعة — شوف إعدادات البطارية</item>
+    </plurals>
+    <plurals name="offline_days">
+        <item quantity="zero">مو متصل من %d يوم</item>
+        <item quantity="one">مو متصل من يوم</item>
+        <item quantity="two">مو متصل من يومين</item>
+        <item quantity="few">مو متصل من %d أيام</item>
+        <item quantity="many">مو متصل من %d يوم</item>
+        <item quantity="other">مو متصل من %d يوم</item>
+    </plurals>
+    <string name="dash_admin_ok">✓ مسؤول الجهاز: شغّال</string>
+    <string name="dash_admin_bad">✗ مسؤول الجهاز: مو شغّال — شوف الإعداد على موبايل الولد</string>
+    <string name="dash_vpn_ok">✓ قطع النت: جاهز</string>
+    <string name="dash_vpn_bad">✗ قطع النت: بدو إعداد — شوف الإعداد على موبايل الولد</string>
+    <string name="dash_acc_ok">✓ حجب التطبيقات: شغّال</string>
+    <string name="dash_acc_bad">✗ حجب التطبيقات: مو شغّال — شوف الإعداد على موبايل الولد (الخطوة 2)</string>
+    <string name="no_zones_set">ما في أماكن آمنة.</string>
+    <plurals name="zones_summary">
+        <item quantity="zero">%1$d مكان آمن: %2$s</item>
+        <item quantity="one">مكان آمن واحد: %2$s</item>
+        <item quantity="two">مكانين آمنين: %2$s</item>
+        <item quantity="few">%1$d أماكن آمنة: %2$s</item>
+        <item quantity="many">%1$d مكان آمن: %2$s</item>
+        <item quantity="other">%1$d مكان آمن: %2$s</item>
+    </plurals>
+    <string name="no_position_yet">لسا ما وصل موقع</string>
+    <string name="map_label_child">الولد</string>
+
+    <!-- Activity tab -->
+    <string name="today">اليوم</string>
+    <string name="no_usage_yet">لسا ما في بيانات استخدام</string>
+    <string name="time_rules">قواعد الوقت</string>
+    <string name="no_time_rules">ما في قواعد وقت</string>
+    <string name="app_usage">استخدام التطبيقات</string>
+    <string name="alerts_and_calls">التنبيهات والمكالمات</string>
+    <string name="no_usage_grant">لسا ما في بيانات استخدام. اعطي صلاحية الوصول لبيانات الاستخدام على موبايل الولد (الزر 1).</string>
+    <plurals name="apps_used_today">
+        <item quantity="zero">ما في تطبيقات انستعملت اليوم</item>
+        <item quantity="one">تطبيق واحد انستعمل اليوم</item>
+        <item quantity="two">تطبيقين انستعملوا اليوم</item>
+        <item quantity="few">%d تطبيقات انستعملوا اليوم</item>
+        <item quantity="many">%d تطبيق انستعملوا اليوم</item>
+        <item quantity="other">%d تطبيق انستعملوا اليوم</item>
+    </plurals>
+    <string name="no_rules_hint">ما في قواعد وقت. ضيف وقت النوم أو وقت الدراسة من الإعدادات.</string>
+    <string name="rule_locks_phone">بيقفل الموبايل</string>
+    <string name="rule_no_internet">بلا نت</string>
+    <string name="rule_apps_only">تطبيقات بس</string>
+    <string name="rule_active">● شغّالة هلأ  </string>
+
+    <!-- Live tab -->
+    <string name="notify_me_about">نبّهني على</string>
+    <string name="notify_nothing">ولا شي. الأحداث بتنسجّل تحت بس موبايلك بيضل ساكت.</string>
+    <string name="feed_off">التسجيل مطفي. شغّل سجل النشاط من الإعدادات.</string>
+    <string name="feed_pair_first">لسا ما في شي — اربط جهاز الولد بالأول.</string>
+    <string name="feed_need_acc">لسا ما في شي. فتح التطبيقات بدو خدمة إمكانية الوصول على موبايل الولد (الزر 2).</string>
+    <plurals name="recent_events">
+        <item quantity="zero">ما في أحداث</item>
+        <item quantity="one">حدث واحد مؤخراً</item>
+        <item quantity="two">حدثين مؤخراً</item>
+        <item quantity="few">%d أحداث مؤخراً</item>
+        <item quantity="many">%d حدث مؤخراً</item>
+        <item quantity="other">%d حدث مؤخراً</item>
+    </plurals>
+
+    <!-- Settings tab -->
+    <string name="call_filtering">فلترة المكالمات</string>
+    <string name="call_off">مطفية — كل المكالمات بترن</string>
+    <string name="call_block_unknown">احجب الأرقام اللي مو محفوظة بجهات الاتصال</string>
+    <string name="call_whitelist">بس الأرقام اللي سمحتلها — واحجب كل شي غيرها</string>
+    <string name="call_outgoing_too">طبّقها عالمكالمات الصادرة كمان</string>
+    <string name="always_ring">بيرنوا دايماً — ما بينحجبوا أبداً مهما كان الوضع</string>
+    <string name="one_number_per_line">رقم بكل سطر</string>
+    <string name="also_allowed">مسموحين كمان</string>
+    <string name="always_blocked">محجوبين دايماً</string>
+    <string name="save_numbers">احفظ الأرقام</string>
+    <string name="restrictions">القيود</string>
+    <string name="disable_camera">سكّر الكاميرا</string>
+    <string name="sos_on_child">زر الاستغاثة على جهاز الولد</string>
+    <string name="weekly_report">تقرير أسبوعي</string>
+    <string name="record_feed">سجّل النشاط المباشر</string>
+    <string name="record_feed_hint">اختار أي أحداث بتنبّهك من تبويب \"مباشر\".</string>
+    <string name="daily_limit">حد وقت الشاشة اليومي</string>
+    <string name="lock_at_limit">اقفل الموبايل لما يخلص الحد</string>
+    <string name="apps_on_child">التطبيقات على موبايل الولد</string>
+    <string name="search_apps">دوّر على تطبيق</string>
+    <string name="alerts">التنبيهات</string>
+    <string name="notification_settings">إعدادات الإشعارات</string>
+    <string name="safe_zones">الأماكن الآمنة</string>
+    <string name="name">الاسم</string>
+    <string name="add_zone_here">ضيف مكان بموقعي هلأ</string>
+    <string name="remove_all_zones">امسح كل الأماكن</string>
+    <string name="add_bedtime">ضيف وقت النوم 22:00–07:00</string>
+    <string name="add_study">ضيف وقت الدراسة 16:00–18:00</string>
+    <string name="remove_all_rules">امسح كل القواعد</string>
+    <string name="language">اللغة</string>
+    <string name="lang_system">متل الموبايل</string>
+    <string name="lang_en">English</string>
+    <string name="lang_ar">العربية</string>
+    <string name="about">عن التطبيق</string>
+    <string name="alerts_ok">التنبيهات فيها توصل لهالموبايل.</string>
+    <string name="alerts_blocked">التنبيهات مسكّرة. الاستغاثة والمتصلين الغريبين ما رح يوصلوك.</string>
+    <string name="emergency_never_blocked">أرقام الطوارئ ما بتنحجب أبداً. </string>
+    <plurals name="priority_count">
+        <item quantity="zero">ما في أرقام بترن دايماً.</item>
+        <item quantity="one">رقم واحد بيرن دايماً.</item>
+        <item quantity="two">رقمين بيرنوا دايماً.</item>
+        <item quantity="few">%d أرقام بيرنوا دايماً.</item>
+        <item quantity="many">%d رقم بيرنوا دايماً.</item>
+        <item quantity="other">%d رقم بيرنوا دايماً.</item>
+    </plurals>
+    <string name="no_zones_yet">لسا ما في أماكن آمنة.</string>
+    <string name="zone_row">%1$s  ·  %2$d م</string>
+    <string name="no_rules_yet">لسا ما في قواعد وقت.</string>
+    <string name="saved_check_short">انحفظ، بس شيك على هدول — مبيّنين قصار كتير: %1$s</string>
+    <string name="zone_default_name">مكان %1$d</string>
+    <string name="locating">عم نحدد الموقع…</string>
+    <string name="no_position">ما قدرنا نجيب الموقع</string>
+    <string name="apps_not_sent">جهاز الولد لسا ما بعت قائمة تطبيقاته. بيبعتها كل ساعة.</string>
+    <string name="apps_restricted_of">%1$d محجوب من أصل %2$d تطبيق</string>
+    <string name="apps_matching">%1$d نتيجة</string>
+    <string name="app_restricted">محجوب</string>
+    <string name="app_limit_day">الحد: %1$s باليوم</string>
+    <string name="app_allowed">مسموح</string>
+    <string name="app_limit_btn">الحد: %1$s</string>
+    <string name="set_limit">حط حد</string>
+    <string name="limit">حد</string>
+    <string name="apps_more">…وفي كمان %1$d. استعمل البحث.</string>
+    <string name="no_limit">بلا حد</string>
+    <string name="custom">مخصص…</string>
+    <string name="daily_limit_for">الحد اليومي — %1$s</string>
+    <string name="minutes_per_day">دقايق باليوم</string>
+
+    <!-- Call modes -->
+    <string name="mode_block_unknown">احجب الأرقام اللي مو بجهات الاتصال</string>
+    <string name="mode_whitelist">بس الأرقام اللي سمحتلها</string>
+
+    <!-- Event labels -->
+    <string name="ev_app_opened">فتح تطبيق</string>
+    <string name="ev_app_blocked">حاول يفتح تطبيق محجوب</string>
+    <string name="ev_app_installed">نزّل تطبيق</string>
+    <string name="ev_app_uninstalled">مسح تطبيق</string>
+    <string name="ev_unlock">فتح قفل الموبايل</string>
+    <string name="ev_screen_on">الشاشة اشتغلت</string>
+    <string name="ev_screen_off">الشاشة انطفت</string>
+    <string name="ev_call">مكالمة</string>
+    <string name="ev_power">الشاحن</string>
+    <string name="ev_internet">النت تغيّر</string>
+    <string name="ev_limit">خلص الوقت المسموح</string>
+    <string name="ev_boot">الموبايل رجع اشتغل</string>
+    <string name="ev_pin">حاول يثبّت تطبيق عالشاشة</string>
+    <string name="ev_tamper">الحماية انطفت</string>
+    <string name="ev_request">طلب وقت زيادة</string>
+    <string name="ev_charger_in">الشاحن انوصل</string>
+    <string name="ev_charger_out">الشاحن انشال</string>
+    <string name="ev_new_app">تطبيق جديد انزّل</string>
+    <string name="ev_app_updated">التطبيق اتحدّث</string>
+    <string name="ev_tried_blocked">حاول يفتح تطبيق محجوب</string>
+
+    <!-- Child-side alerts & notifications -->
+    <string name="blocked_by_parent">محجوب من الأهل</string>
+    <string name="call_blocked">انحجبت مكالمة</string>
+    <string name="unknown_caller">متصل مو معروف</string>
+    <string name="call_incoming">واردة</string>
+    <string name="call_outgoing">صادرة</string>
+    <string name="withheld">رقم مخفي</string>
+    <string name="zone_left_title">طلع من %1$s</string>
+    <string name="zone_left_body">طلع من المكان الآمن</string>
+    <string name="zone_arrived_title">وصل عـ%1$s</string>
+    <string name="zone_arrived_body">فات عالمكان الآمن</string>
+    <string name="sos_title">🆘 استغاثة</string>
+    <string name="sos_body">انكبس زر الاستغاثة على %1$s</string>
+    <string name="sos_location_title">🆘 موقع الاستغاثة</string>
+    <string name="bedtime">وقت النوم</string>
+    <string name="study_time">وقت الدراسة</string>
+    <string name="net_timer_ended">خلص وقت النت المؤقت</string>
+    <string name="net_auto_reblocked">النت انقطع لحاله</string>
+    <string name="limit_used_up">خلص وقت الشاشة لليوم</string>
+    <string name="limit_budget_was">الحد كان %1$d دقيقة</string>
+    <string name="pin_with_app">حاول يثبّت \"%1$s\" عالشاشة. الشاشة انقفلت لحالها.</string>
+    <string name="pin_generic">انكشف تثبيت شاشة. الشاشة انقفلت لحالها.</string>
+    <string name="cant_lock_title">ما قدرنا نقفل الموبايل</string>
+    <string name="cant_lock_body">مسؤول الجهاز مو مفعّل على موبايل الولد. افتح حارس العيلة هنيك ← الإعداد ← \"فعّل مسؤول الجهاز\".</string>
+    <string name="cant_net_title">ما قدرنا نقطع النت</string>
+    <string name="cant_net_body">صلاحية الـ VPN مو معطاة على موبايل الولد. افتح حارس العيلة هنيك ← الإعداد ← \"شغّل فلتر النت\" ووافق عالطلب.</string>
+    <string name="notif_supervised">جهاز تحت الرقابة</string>
+    <string name="notif_watching">عم نراقب التنبيهات</string>
+    <string name="notif_internet_off">النت مقطوع</string>
+    <string name="notif_filtering">التصفح الآمن شغّال</string>
+    <string name="alert_generic">تنبيه</string>
+    <string name="new_message">رسالة جديدة</string>
+    <string name="action_map">الخريطة</string>
+    <string name="action_who">مين هاد؟</string>
+    <string name="action_call">اتصل</string>
+    <string name="ch_supervision">الرقابة</string>
+    <string name="ch_filter">فلتر النت</string>
+    <string name="ch_activity">النشاط</string>
+    <string name="ch_activity_desc">شو عم يصير على جهاز الولد</string>
+    <string name="ch_alerts">التنبيهات</string>
+    <string name="ch_alerts_desc">تنبيهات فورية للأهل</string>
+    <string name="ch_requests">الطلبات</string>
+    <string name="ch_requests_desc">طلبات الوقت الزيادة والمكافآت من الولد</string>
+    <string name="weekly_title">التقرير الأسبوعي — %1$s</string>
+    <string name="weekly_total">مجموع وقت الشاشة: %1$s</string>
+    <string name="weekly_avg">المعدل باليوم: %1$s</string>
+    <string name="weekly_top">الأكتر استعمالاً:</string>
+    <string name="screenshot_uploading">انأخدت لقطة شاشة — عم نرفعها…</string>
+    <string name="lang_toast">اللغة: %1$s</string>
+    <string name="panic_triggered">طوارئ — انبعتت استغاثة</string>
+
+    <!-- About -->
+    <string name="parent">الأهل</string>
+    <string name="role_parent_suffix">%1$s — الأهل</string>
+    <string name="e_signature">التوقيع الإلكتروني</string>
+    <string name="sign_here">✍  وقّع هون</string>
+    <string name="cd_app_icon">أيقونة التطبيق</string>
+    <string name="cd_saved_signature">التوقيع المحفوظ</string>
+    <string name="contact">تواصل</string>
+    <string name="draw_signature_first">ارسم توقيعك بالأول</string>
+    <string name="signature_saved">انحفظ التوقيع ✓</string>
+    <string name="signature_restored">رجع التوقيع الأصلي</string>
+    <string name="no_app_for_link">ما في تطبيق بيفتح هالرابط</string>
+    <string name="cd_sos">زر استغاثة — بيبعت تنبيه للأهل مع الموقع</string>
+
+    <!-- Tamper alerts -->
+    <string name="tamper_title">⚠ في حماية انطفت</string>
+    <string name="tamper_body">في شي انطفى على موبايل الولد:\n%1$s\n\nافتح حارس العيلة هنيك ورجّع شغّله.</string>
+    <string name="tamper_admin">مسؤول الجهاز (حماية من الحذف)</string>
+    <string name="tamper_vpn">فلتر النت (VPN)</string>
+    <string name="tamper_acc">حجب التطبيقات (إمكانية الوصول)</string>
+    <string name="tamper_admin_attempt">حدا فتح شاشة إلغاء مسؤول الجهاز — هي أول خطوة لحذف التطبيق</string>
+
+    <!-- Extra time & rewards — child -->
+    <string name="child_time_title">وقتي عالشاشة</string>
+    <string name="ask_more_time">اطلب وقت زيادة</string>
+    <string name="my_tasks">مهمات بتكسبك وقت</string>
+    <string name="no_tasks_child">لسا ما في مهمات. أهلك فيهم يضيفوا.</string>
+    <string name="request_already_waiting">طلبت قبل — استنى لحتى يردّوا أهلك.</string>
+    <string name="request_sent">انبعت لأهلك</string>
+    <string name="request_failed">ما انبعت. شوف النت.</string>
+    <string name="child_no_limit">ما في حد لليوم.</string>
+    <string name="child_time_left">باقيلك اليوم: %1$s</string>
+    <string name="child_bonus_today">منهم %1$s زيادة من أهلك</string>
+    <string name="request_waiting">عم نستنى الرد: %1$s</string>
+    <string name="request_approved">✓ وافقوا: %1$s</string>
+    <string name="request_denied">✗ مو هالمرة: %1$s</string>
+    <string name="task_reward">بتكسبك %1$s</string>
+    <string name="task_waiting">عم نستنى…</string>
+    <string name="task_done">خلّصتها ✓</string>
+    <string name="request_task_label">%1$s (%2$s)</string>
+    <string name="request_time_label">%1$s زيادة</string>
+    <string name="time_up_title">خلص وقتك عالشاشة</string>
+    <string name="time_up_body">اكبس لتطلب من أهلك وقت زيادة.</string>
+
+    <!-- Extra time & rewards — parent -->
+    <string name="requests_title">عم يستنوا ردّك</string>
+    <string name="req_time_title">طلب وقت زيادة</string>
+    <string name="req_task_title">خلّص مهمة</string>
+    <string name="req_time_body">بدو %1$s زيادة عالشاشة</string>
+    <string name="req_task_body">بيقول إنه خلّص \"%1$s\" — المكافأة %2$s</string>
+    <string name="request_decide_failed">ما انحفظ الرد. شوف النت.</string>
+    <string name="request_approved_toast">تمت الموافقة — انضاف الوقت</string>
+    <string name="request_denied_toast">انرفض</string>
+    <string name="bonus_today">+%1$s اليوم</string>
+    <string name="rewards_title">المكافآت</string>
+    <string name="rewards_hint">مهمات بيعملها ابنك أو بنتك ليكسبوا وقت شاشة زيادة. لما يكبسوا \"خلّصتها\" بتوافق أو بترفض.</string>
+    <string name="task_title_hint">المهمة، مثلاً الوظيفة</string>
+    <string name="task_minutes_hint">دقايق</string>
+    <string name="add_task">ضيف مهمة</string>
+    <string name="task_need_title">اكتب المهمة بالأول</string>
+    <string name="no_tasks_parent">لسا ما في مهمات.</string>
+
+    <!-- Safe browsing -->
+    <string name="safe_browsing">التصفح الآمن</string>
+    <string name="safe_browsing_hint">بيحجب مواقع الكبار والقمار، وبيفرض البحث الآمن على Google وBing والوضع المقيّد على YouTube. بيستعمل فلتر العيلة المجاني من CleanBrowsing.</string>
+
+    <!-- Second parent -->
+    <string name="second_parent_title">الأب أو الأم التاني</string>
+    <string name="second_parent_hint">لتضيف الطرف التاني: نزّل التطبيق على موبايله، اختار \"أنا الأب أو الأم\" ← \"انضم للطرف التاني\" واكتب %1$s. اكبس الزر تحت بالأول — بيفتح نافذة 15 دقيقة.</string>
+    <string name="invite_parent">افتح النافذة للطرف التاني</string>
+    <string name="family_setup_title">إعداد موبايل الأهل</string>
+    <string name="family_new">ابدأ عيلة جديدة</string>
+    <string name="family_join">انضم للطرف التاني</string>
+    <string name="family_join_hint">على موبايل الطرف التاني: الإعدادات ← الأب أو الأم التاني ← افتح النافذة. بعدها اكتب الرمز اللي طالع هنيك.</string>
+    <string name="family_joined">انضميت — صرت تشوف نفس الولد</string>
+
+    <!-- Timeline -->
+    <string name="timeline_title">أماكن اليوم</string>
+    <string name="timeline_empty">لسا ما انسجّلت تحركات اليوم.</string>
+    <string name="timeline_route">ورجيني الطريق عالخريطة</string>
+    <string name="timeline_range">%1$s – %2$s</string>
 </resources>

@@ -1,5 +1,7 @@
 package com.tarek.guardian.monitor
 
+import com.tarek.guardian.R
+import com.tarek.guardian.L10n
 import android.accessibilityservice.AccessibilityService
 import android.content.ComponentName
 import android.content.Context
@@ -108,9 +110,9 @@ class AppBlockService : AccessibilityService() {
             // does nothing.
             if (blocked.contains("*")) policyMgr.lockNow()
             if (changed) {
-                Toast.makeText(this, "Blocked by parent", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, L10n.s(R.string.blocked_by_parent), Toast.LENGTH_SHORT).show()
                 EventReporter.recordApp(
-                    this, ActivityEvent.APP_BLOCKED, pkg, "Tried to open a blocked app"
+                    this, ActivityEvent.APP_BLOCKED, pkg, L10n.s(R.string.ev_tried_blocked)
                 )
             }
             lastSeenPkg = pkg

@@ -1,5 +1,6 @@
 package com.tarek.guardian.calls
 
+import com.tarek.guardian.L10n
 import android.app.Activity
 import android.app.role.RoleManager
 import android.content.Context
@@ -64,9 +65,9 @@ object CallScreeningRole {
 
     /** Human-readable state for the setup screen. */
     fun statusText(ctx: Context): String = when {
-        !isSupported()      -> "Not supported (needs Android 10+)"
-        !isAvailable(ctx)   -> "Not available on this device"
-        isHeld(ctx)         -> "Active"
-        else                -> "Not active — tap to enable"
+        !isSupported()      -> L10n.s(com.tarek.guardian.R.string.call_role_unsupported)
+        !isAvailable(ctx)   -> L10n.s(com.tarek.guardian.R.string.call_role_unavailable)
+        isHeld(ctx)         -> L10n.s(com.tarek.guardian.R.string.call_role_active)
+        else                -> L10n.s(com.tarek.guardian.R.string.call_role_inactive)
     }
 }

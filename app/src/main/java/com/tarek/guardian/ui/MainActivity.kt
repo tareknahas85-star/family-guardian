@@ -76,7 +76,57 @@ class MainActivity : AppCompatActivity() {
         b.tvBell.setOnClickListener { openNotificationSettings() }
 
         val saved = Prefs.getPairCode(this)
-        if (saved != null) startWithCode(saved) else createOwnedCode()
+        if (saved != null) startWithCode(saved) else chooseFamilySetup()
+    }
+
+    /**
+     * First run on a parent phone: start a new family (this phone creates and
+     * owns the code), or join the family the other parent already set up.
+     */
+    private fun chooseFamilySetup() {
+        b.tvHeaderSub.text = getString(R.string.code_creating)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.family_setup_title)
+            .setItems(arrayOf(getString(R.string.family_new), getString(R.string.family_join))) { _, which ->
+                if (which == 0) createOwnedCode() else joinExistingFamily()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    /** Second parent: joins with the code shown on the first parent's phone. */
+    private fun joinExistingFamily() {
+        val input = android.widget.EditText(this).apply {
+            hint = getString(R.string.pair_code)
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+            setPadding(48, 32, 48, 32)
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.family_join)
+            .setMessage(R.string.family_join_hint)
+            .setView(input)
+            .setCancelable(false)
+            .setPositiveButton(R.string.pair_device) { _, _ ->
+                val c = input.text.toString().trim().uppercase()
+                if (c.length < 4) { chooseFamilySetup(); return@setPositiveButton }
+                FirebaseRepo.claimDeviceDetailed(c) { ok, err ->
+                    if (isFinishing) return@claimDeviceDetailed
+                    if (!ok) {
+                        AlertDialog.Builder(this)
+                            .setTitle("✗")
+                            .setMessage(getString(R.string.pair_failed_child, pairingErrorText(this, err)))
+                            .setCancelable(false)
+                            .setPositiveButton(R.string.retry) { _, _ -> chooseFamilySetup() }
+                            .show()
+                        return@claimDeviceDetailed
+                    }
+                    Prefs.setPairCode(this, c)
+                    startWithCode(c)
+                    Toast.makeText(this, getString(R.string.family_joined), Toast.LENGTH_LONG).show()
+                }
+            }
+            .setNegativeButton(R.string.cancel) { _, _ -> chooseFamilySetup() }
+            .show()
     }
 
     /**
@@ -131,7 +181,7 @@ class MainActivity : AppCompatActivity() {
             append("v${BuildConfig.VERSION_NAME}")
             append("  ·  ")
             append(code)
-            if (!notifOk) append("  ·  alerts off")
+            if (!notifOk) append("  ·  " + getString(R.string.header_alerts_off))
         }
     }
 
@@ -145,9 +195,7 @@ class MainActivity : AppCompatActivity() {
             if (!ok) {
                 GuardianState.update {
                     it.copy(
-                        error = "Cannot reach the database. Check the connection, that " +
-                            "Anonymous sign-in is enabled in Firebase, and that the rules " +
-                            "were published."
+                        error = getString(R.string.db_unreachable)
                     )
                 }
             }
@@ -180,6 +228,14 @@ class MainActivity : AppCompatActivity() {
                 GuardianState.update { it.copy(lat = lat, lng = lng, locationTs = ts) }
             }
 
+            FirebaseRepo.listenRequests(code) { list ->
+                GuardianState.update { it.copy(requests = list) }
+            }
+
+            FirebaseRepo.listenTrack(code, today) { points ->
+                GuardianState.update { it.copy(track = points) }
+            }
+
             FirebaseRepo.listenEvents(code) { e ->
                 events.removeAll { it.id == e.id }
                 events.add(e)
@@ -208,6 +264,20 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, confirmation, Toast.LENGTH_SHORT).show()
     }
 
+    fun decideRequest(id: String, approve: Boolean) {
+        if (!::code.isInitialized) return
+        com.tarek.guardian.alerts.RequestNotifier.cancel(this, id)
+        FirebaseRepo.decideRequest(code, id, approve) { ok ->
+            runOnUiThread {
+                Toast.makeText(
+                    this,
+                    getString(if (!ok) R.string.request_decide_failed else if (approve) R.string.request_approved_toast else R.string.request_denied_toast),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
     fun savePolicy(mutate: (com.tarek.guardian.data.Policy) -> Unit) {
         if (!::code.isInitialized) return
         val p = GuardianState.snapshot.policy
@@ -232,7 +302,7 @@ class MainActivity : AppCompatActivity() {
         }
         Toast.makeText(
             this,
-            "Internet open for ${GuardianState.formatDuration(minutes)} — it re-blocks itself after that",
+            getString(R.string.internet_open_for, GuardianState.formatDuration(minutes)),
             Toast.LENGTH_LONG
         ).show()
     }
@@ -265,7 +335,7 @@ class MainActivity : AppCompatActivity() {
                     .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, packageName)
             )
         } catch (_: Exception) {
-            Toast.makeText(this, "Open Settings > Apps > Family Guardian > Notifications",
+            Toast.makeText(this, getString(R.string.open_notif_settings_hint),
                 Toast.LENGTH_LONG).show()
         }
     }
@@ -293,13 +363,13 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
             } else {
-                Toast.makeText(this, "Battery is already unrestricted", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.battery_already_ok), Toast.LENGTH_SHORT).show()
             }
         } catch (_: Exception) {
             try {
                 startActivity(Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
             } catch (_: Exception) {
-                Toast.makeText(this, "Open Settings > Battery > Unrestricted", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.open_battery_hint), Toast.LENGTH_LONG).show()
             }
         }
     }

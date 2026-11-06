@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A row with a title, a detail line and up to two text actions.
+     Shared by requests, reward tasks and the location timeline. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="horizontal" android:gravity="center_vertical"
+    android:paddingTop="6dp" android:paddingBottom="6dp">
+
+    <TextView android:id="@+id/tvRowIcon" android:layout_width="28dp"
+        android:layout_height="wrap_content" android:textSize="16sp"
+        android:gravity="center" android:visibility="gone" />
+
+    <LinearLayout android:layout_width="0dp" android:layout_weight="1"
+        android:layout_height="wrap_content" android:orientation="vertical">
+        <TextView android:id="@+id/tvRowTitle" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="15sp"
+            android:textColor="@color/on_surface" />
+        <TextView android:id="@+id/tvRowDetail" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="12sp"
+            android:textColor="@color/on_surface_variant" />
+    </LinearLayout>
+
+    <TextView android:id="@+id/btnRowA" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:textSize="13sp"
+        android:textStyle="bold" android:textColor="@color/primary"
+        android:padding="8dp" android:visibility="gone"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+
+    <TextView android:id="@+id/btnRowB" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:textSize="13sp"
+        android:textStyle="bold" android:textColor="@color/error"
+        android:padding="8dp" android:visibility="gone"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+</LinearLayout>
