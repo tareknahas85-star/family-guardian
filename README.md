@@ -42,7 +42,7 @@ It works, but it is a personal project. It is not on Google Play. You build the
 APK yourself, or download it from the
 [latest release](https://github.com/tareknahas85-star/family-guardian/releases/tag/latest).
 
-### What's new in 10.0
+### What's new in 5.2
 
 - **Full Arabic.** Every screen, notification and message in Levantine Arabic,
   right-to-left. Settings → Language switches the whole app.
@@ -195,7 +195,7 @@ GitHub Actions builds the APK on every push.
 شغّال، بس هو مشروع شخصي. مو عـ Google Play. إما بتبني ملف APK بإيدك، أو بتنزّلو من
 [صفحة آخر إصدار](https://github.com/tareknahas85-star/family-guardian/releases/tag/latest).
 
-### شو الجديد بـ 10.0
+### شو الجديد بـ 5.2
 
 - **عربي كامل.** كل شاشة وإشعار ورسالة بالشامي، ومن اليمين لليسار. من الإعدادات
   ← اللغة بتقلب التطبيق كله.
