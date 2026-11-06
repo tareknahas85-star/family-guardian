@@ -276,3 +276,10 @@ Kotlin، وView Binding، وFirebase Realtime Database والمصادقة، وFi
 Messaging، وWorkManager، و`AccessibilityService`، و`DevicePolicyManager`،
 و`CallScreeningService`، وخدمة `VpnService` محلية لمفتاح الإنترنت. وGitHub
 Actions بيبني ملف APK عند كل رفع.
+
+
+## Contribute · ساهم معنا
+
+Want to help? Read [CONTRIBUTING.md](CONTRIBUTING.md). Issues labelled [`good first issue`](../../labels/good%20first%20issue) are an easy start, and questions or ideas are welcome in [Discussions](../../discussions).
+
+بدك تساعد؟ اقرا [CONTRIBUTING.md](CONTRIBUTING.md). المهام اللي عليها [`good first issue`](../../labels/good%20first%20issue) بداية سهلة، وأي سؤال أو فكرة احكيها بـ [Discussions](../../discussions).
