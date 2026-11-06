@@ -1,6 +1,13 @@
 # Family Guardian
 
+**Parental control for Android. One app, two modes, and the child always knows.**
+**رقابة أبوية لأندرويد. تطبيق واحد، وضعين، والولد دايمًا بيعرف.**
+
+![Family Guardian poster](docs/Family-Guardian-poster.png)
+
 **[⬇️ Download latest APK](https://github.com/tareknahas85-star/family-guardian/releases/latest/download/family-guardian.apk)** &nbsp;|&nbsp; **[⬇️ حمّل آخر نسخة APK](https://github.com/tareknahas85-star/family-guardian/releases/latest/download/family-guardian.apk)**
+
+[English](#in-english) &nbsp;·&nbsp; [بالعربي](#بالعربي) &nbsp;·&nbsp; [Setup · الإعداد](docs/SETUP.md) &nbsp;·&nbsp; [Privacy · الخصوصية](docs/PRIVACY.md)
 
 ![Build APK](../../actions/workflows/build.yml/badge.svg)
 
