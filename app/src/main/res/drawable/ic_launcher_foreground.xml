@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Foreground layer for Adaptive Icon (API 26+).
-    Canvas: 108×108 dp — safe zone: 18→90 dp on each axis.
-    No solid background here; background is provided by ic_launcher_background color.
+    Vector version of the app icon (white house with an amber heart on teal).
+    Canvas: 108×108 dp. Used as the SOS widget preview image; the launcher icon
+    itself uses the PNGs in mipmap-* (same artwork).
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -10,39 +10,21 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- ── Outer shield shadow/border ── -->
+    <!-- Teal disc so the preview reads on light and dark backgrounds -->
     <path
-        android:fillColor="#0D47A1"
-        android:pathData="M54,16 L86,28 L86,58 C86,77 73,90 54,97 C35,90 22,77 22,58 L22,28 Z" />
+        android:fillColor="#00897B"
+        android:pathData="M54,18 A36,36 0 1,1 53.99,18 Z" />
 
-    <!-- ── Shield body (medium blue) ── -->
-    <path
-        android:fillColor="#1565C0"
-        android:pathData="M54,22 L80,33 L80,58 C80,74 69,85 54,92 C39,85 28,74 28,58 L28,33 Z" />
-
-    <!-- ── Shield inner highlight (lighter blue) ── -->
-    <path
-        android:fillColor="#1E88E5"
-        android:pathData="M54,28 L76,38 L76,57 C76,71 66,80 54,87 C42,80 32,71 32,57 L32,38 Z" />
-
-    <!-- ── Pink/rose badge circle (two half-arcs = full circle, r=15, center 54,57) ── -->
-    <path
-        android:fillColor="#E91E63"
-        android:pathData="M39,57 A15,15 0 1,0 69,57 A15,15 0 1,0 39,57 Z" />
-
-    <!-- ── Eye white (ellipse, rx=9 ry=6, center 54,57) ── -->
-    <path
-        android:fillColor="#FFEBEE"
-        android:pathData="M45,57 A9,6 0 1,0 63,57 A9,6 0 1,0 45,57 Z" />
-
-    <!-- ── Eye pupil (circle r=4, center 54,57) ── -->
-    <path
-        android:fillColor="#880E4F"
-        android:pathData="M50,57 A4,4 0 1,0 58,57 A4,4 0 1,0 50,57 Z" />
-
-    <!-- ── Pupil shine (small white circle) ── -->
+    <!-- House -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M52,55 A2,2 0 1,0 56,55 A2,2 0 1,0 52,55 Z" />
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round"
+        android:pathData="M54,27 L83,53 L76,53 L76,79 Q76,81 74,81 L34,81 Q32,81 32,79 L32,53 L25,53 Z" />
 
+    <!-- Heart -->
+    <path
+        android:fillColor="#F9A825"
+        android:pathData="M54,74 C54,74 41.5,66.5 41.5,59 C41.5,55.2 44.4,52.3 48,52.3 C50.6,52.3 52.7,53.8 54,56 C55.3,53.8 57.4,52.3 60,52.3 C63.6,52.3 66.5,55.2 66.5,59 C66.5,66.5 54,74 54,74 Z" />
 </vector>

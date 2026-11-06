@@ -5,16 +5,21 @@
         ".read":  "auth != null && data.child('members').child(auth.uid).exists()",
         ".write": "auth != null && data.child('members').child(auth.uid).exists()",
 
+        "owner": {
+          ".write":    "auth != null && !data.parent().exists() && newData.val() === auth.uid && newData.parent().child('members').child(auth.uid).val() === true",
+          ".validate": "newData.isString() && (!data.exists() || newData.val() === data.val())"
+        },
+
         "members": {
           "$uid": {
-            ".write":    "auth != null && $uid === auth.uid && (!data.parent().exists() || root.child('devices').child($code).child('pairingOpenUntil').val() > now)",
-            ".validate": "newData.isBoolean()"
+            ".write":    "auth != null && $uid === auth.uid && ((!data.parent().parent().exists() && newData.parent().parent().child('owner').val() === auth.uid) || (data.parent().parent().child('pairingOpenUntil').isNumber() && data.parent().parent().child('pairingOpenUntil').val() > now))",
+            ".validate": "newData.isBoolean() && (data.exists() || $uid === auth.uid)"
           }
         },
 
         "pairingOpenUntil": {
-          ".write":    "auth != null && (!data.parent().child('members').exists() || data.parent().child('members').child(auth.uid).exists())",
-          ".validate": "newData.isNumber() && newData.val() <= now + 3600000"
+          ".write":    "auth != null && !data.parent().exists() && newData.parent().child('owner').val() === auth.uid",
+          ".validate": "newData.isNumber() && newData.val() <= now + 3600000 && (!newData.parent().child('owner').exists() || newData.parent().child('owner').val() === auth.uid)"
         }
       }
     }

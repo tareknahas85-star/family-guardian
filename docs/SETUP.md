@@ -37,9 +37,12 @@ Open **Realtime Database → Rules**. Delete what is there. Paste the contents o
 > and call log, with no password. If you ever used those rules, replace them now.
 
 The correct rules work like this. Each pairing code has a `members` list. A phone
-can only read or write a code if its Firebase user id is in that list. A phone can
-add itself only when the code is brand new, or when the parent has pressed
-**Open pairing window** in the app. That window lasts 15 minutes.
+can only read or write a code if its Firebase user id is in that list. Only the
+parent phone can create a code: it writes itself as `owner` and member in one step,
+and shows the code only after the server accepted it. The child can add itself only
+while the owner's pairing window is open. That window lasts 15 minutes, opens
+automatically when the code is created, and can be reopened with
+**Open pairing window**.
 
 ---
 

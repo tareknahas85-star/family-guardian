@@ -20,6 +20,9 @@
     <string name="pair_opening">Opening the pairing window…</string>
     <string name="pair_window_open">The child device can join for the next 15 minutes.\n\nOn the child phone enter exactly this code: %1$s</string>
     <string name="pair_window_failed">Could not open the pairing window.\n\n%1$s</string>
+    <string name="code_creating">Creating your pairing code…</string>
+    <string name="code_create_failed">Could not create a pairing code.\n\n%1$s</string>
+    <string name="retry">Retry</string>
     <string name="pair_in_progress">Pairing…</string>
     <string name="pair_failed_child">Pairing failed.\n\n%1$s</string>
     <string name="pair_err_denied">The server refused. Either the code is wrong, or the pairing window is closed. On the parent phone tap \"Open pairing window\", then retry within 15 minutes using the exact code shown there.</string>

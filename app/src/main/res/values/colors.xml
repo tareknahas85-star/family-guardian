@@ -50,5 +50,5 @@
     <color name="black">#FF000000</color>
 
     <!-- Adaptive icon background — white so it matches the artwork's own tile. -->
-    <color name="ic_launcher_background">#FFFFFF</color>
+    <color name="ic_launcher_background">#00897B</color>
 </resources>

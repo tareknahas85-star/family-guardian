@@ -54,9 +54,6 @@ class MainActivity : AppCompatActivity() {
         b = ActivityMainBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        code = Prefs.getPairCode(this) ?: genCode().also { Prefs.setPairCode(this, it) }
-        GuardianState.update { it.copy(code = code) }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             notifPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
@@ -78,13 +75,48 @@ class MainActivity : AppCompatActivity() {
 
         b.tvBell.setOnClickListener { openNotificationSettings() }
 
+        val saved = Prefs.getPairCode(this)
+        if (saved != null) startWithCode(saved) else createOwnedCode()
+    }
+
+    /**
+     * First run: the code is made on the server (owned by this phone) BEFORE it
+     * is shown, so the child can never claim it first and lock the parent out.
+     */
+    private fun createOwnedCode() {
+        b.tvHeaderSub.text = getString(R.string.code_creating)
+        FirebaseRepo.createCode { newCode, err ->
+            if (isFinishing) return@createCode
+            if (newCode == null) {
+                AlertDialog.Builder(this)
+                    .setTitle("✗")
+                    .setMessage(getString(R.string.code_create_failed, pairingErrorText(this, err)))
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.retry) { _, _ -> createOwnedCode() }
+                    .show()
+                return@createCode
+            }
+            Prefs.setPairCode(this, newCode)
+            startWithCode(newCode)
+            AlertDialog.Builder(this)
+                .setTitle("✓")
+                .setMessage(getString(R.string.pair_window_open, newCode))
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+        }
+    }
+
+    private fun startWithCode(c: String) {
+        code = c
+        GuardianState.update { it.copy(code = c) }
+        refreshHeader()
         ParentAlertService.start(this)
         attachListeners()
     }
 
     override fun onResume() {
         super.onResume()
-        refreshHeader()
+        if (::code.isInitialized) refreshHeader()
     }
 
     private fun show(f: Fragment) {
@@ -109,6 +141,7 @@ class MainActivity : AppCompatActivity() {
         attachedAt = System.currentTimeMillis()
 
         FirebaseRepo.claimDevice(code) { ok ->
+            if (ok) FirebaseRepo.ensureOwner(code)
             if (!ok) {
                 GuardianState.update {
                     it.copy(
@@ -170,11 +203,13 @@ class MainActivity : AppCompatActivity() {
     // ── Actions the tabs call into ────────────────────────────────────────────
 
     fun sendCommand(type: String, confirmation: String) {
+        if (!::code.isInitialized) return
         FirebaseRepo.pushCommand(code, Command(type = type))
         Toast.makeText(this, confirmation, Toast.LENGTH_SHORT).show()
     }
 
     fun savePolicy(mutate: (com.tarek.guardian.data.Policy) -> Unit) {
+        if (!::code.isInitialized) return
         val p = GuardianState.snapshot.policy
         mutate(p)
         FirebaseRepo.setPolicy(code, p)
@@ -203,6 +238,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun openPairingWindow() {
+        if (!::code.isInitialized) return
         Toast.makeText(this, getString(R.string.pair_opening), Toast.LENGTH_SHORT).show()
         FirebaseRepo.openPairing(code) { ok, err ->
             if (isFinishing) return@openPairing
@@ -277,8 +313,4 @@ class MainActivity : AppCompatActivity() {
 
     private fun ignoreBatteryOptimisations() = Unit
 
-    private fun genCode(): String {
-        val chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-        return (1..6).map { chars.random() }.joinToString("")
-    }
 }

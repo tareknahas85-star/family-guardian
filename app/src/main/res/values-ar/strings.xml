@@ -21,6 +21,9 @@
     <string name="pair_opening">عم نفتح نافذة الربط…</string>
     <string name="pair_window_open">جهاز الولد فيه ينربط خلال الـ15 دقيقة الجاية.\n\nعلى موبايل الولد اكتب هالرمز بالضبط: %1$s</string>
     <string name="pair_window_failed">ما قدرنا نفتح نافذة الربط.\n\n%1$s</string>
+    <string name="code_creating">عم نعمل رمز الربط تبعك…</string>
+    <string name="code_create_failed">ما قدرنا نعمل رمز ربط.\n\n%1$s</string>
+    <string name="retry">جرّب مرة تانية</string>
     <string name="pair_in_progress">عم نربط…</string>
     <string name="pair_failed_child">ما زبط الربط.\n\n%1$s</string>
     <string name="pair_err_denied">السيرفر رفض. يا إما الرمز غلط، يا إما نافذة الربط مسكّرة. على موبايل الأهل اضغط \"فتح نافذة الربط\" وجرّب خلال 15 دقيقة بنفس الرمز اللي طالع هنيك.</string>

@@ -17,13 +17,19 @@ import com.google.firebase.database.ValueEventListener
  * ## Access control
  * Security rules (see `database.rules.json` at the repo root) only let a device
  * touch `/devices/{code}` once its Firebase UID is listed under
- * `/devices/{code}/members`. A UID may add itself when either
- *   * the code has no members yet (the parent claiming a fresh code), or
- *   * `pairingOpenUntil` is in the future (a pairing window the parent opened).
+ * `/devices/{code}/members`. A UID may add itself only when either
+ *   * it is creating a brand-new code and naming itself `owner` in the same
+ *     atomic write ([createCode] — parent only), or
+ *   * `pairingOpenUntil` is in the future (a window only the owner can open).
  *
- * So the flow is: parent calls [claimDevice] -> [openPairing], child calls
- * [claimDevice] while the window is open. Call [claimDevice] on every start;
- * it is a no-op once the UID is already a member.
+ * A child can therefore never "grab" a code first and lock the parent out —
+ * which is exactly what used to happen when the child paired before the
+ * parent's own claim reached the server. The parent only ever shows a code
+ * after the server has confirmed it owns it.
+ *
+ * Flow: parent calls [createCode] once (it also opens the first pairing
+ * window), child calls [claimDevice] while the window is open. Call
+ * [claimDevice] on every start; it is a no-op once the UID is a member.
  */
 object FirebaseRepo {
     private const val TAG = "FirebaseRepo"
@@ -115,6 +121,59 @@ object FirebaseRepo {
                             }
                     }
                 })
+        }
+    }
+
+    private const val CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    private const val CREATE_ATTEMPTS = 5
+
+    private fun randomCode() = (1..6).map { CODE_CHARS.random() }.joinToString("")
+
+    /**
+     * Parent-side: creates a fresh code that this device owns, in ONE atomic
+     * write — `owner`, its own membership and a first pairing window together.
+     *
+     * The code is only returned after the server accepted that write, so the
+     * parent never shows a code it does not own yet. If the random code already
+     * exists the rules refuse it and another one is tried.
+     */
+    fun createCode(onResult: (code: String?, error: String?) -> Unit) {
+        val once = Once<String?, String?> { c, e -> onResult(c, e) }
+        Auth.withUid(onFailed = { msg -> once(null, "$ERR_AUTH: $msg") }) { u ->
+            main.postDelayed({ once(null, ERR_TIMEOUT) }, SERVER_TIMEOUT_MS * CREATE_ATTEMPTS)
+            db.getReference(".info/serverTimeOffset")
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(s: DataSnapshot) = attempt(s.getValue(Long::class.java) ?: 0L, 1)
+                    override fun onCancelled(e: DatabaseError) = attempt(0L, 1)
+                    fun attempt(offset: Long, n: Int) {
+                        val code = randomCode()
+                        val until = System.currentTimeMillis() + offset + PAIRING_WINDOW_MS
+                        root(code).updateChildren(
+                            mapOf(
+                                "owner" to u,
+                                "members/$u" to true,
+                                "pairingOpenUntil" to until
+                            )
+                        ).addOnSuccessListener { once(code, null) }
+                         .addOnFailureListener { e ->
+                             val err = describe(e)
+                             Log.e(TAG, "createCode attempt $n ($code) failed: ${e.message}")
+                             if (err == ERR_DENIED && n < CREATE_ATTEMPTS) attempt(offset, n + 1)
+                             else once(null, err)
+                         }
+                    }
+                })
+        }
+    }
+
+    /**
+     * Parent-side, for codes made before owners existed: records this device as
+     * owner if nobody is yet. The rules refuse it silently if an owner exists.
+     */
+    fun ensureOwner(code: String) {
+        val u = Auth.uid ?: return
+        root(code).child("owner").get().addOnSuccessListener { s ->
+            if (!s.exists()) root(code).child("owner").setValue(u)
         }
     }
 
