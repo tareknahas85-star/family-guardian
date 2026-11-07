@@ -50,6 +50,20 @@ jobs:
             cp app/google-services.json.template app/google-services.json
           fi
 
+      - name: Use the project's fixed signing key
+        # Without this every CI run generated a brand-new debug key, so each
+        # release was signed differently and Android refused to install it
+        # over the previous one ("signatures do not match"). The only way out
+        # was uninstalling, which wiped the pairing and every permission.
+        # The key lives in the DEBUG_KEYSTORE_B64 secret (same key as the
+        # maintainer's local debug builds), so updates now install in place.
+        env:
+          DEBUG_KEYSTORE_B64: ${{ secrets.DEBUG_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$DEBUG_KEYSTORE_B64" ]; then
+            mkdir -p ~/.android
+            printf '%s' "$DEBUG_KEYSTORE_B64" | base64 -d > ~/.android/debug.keystore
+          fi
       - name: Build debug APK
         run: gradle assembleDebug --no-daemon --stacktrace
 
