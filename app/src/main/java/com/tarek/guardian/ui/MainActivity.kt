@@ -175,7 +175,13 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
+    /**
+     * Safe to call at any time. The notification-permission prompt answers
+     * while the first-run family dialog is still open, before a code exists —
+     * reading `code` then crashed the parent app on every fresh install.
+     */
     private fun refreshHeader() {
+        if (!::code.isInitialized) return
         val notifOk = AlertNotifier.canPost(this)
         b.tvHeaderSub.text = buildString {
             append("v${BuildConfig.VERSION_NAME}")
