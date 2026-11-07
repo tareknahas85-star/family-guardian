@@ -61,12 +61,23 @@ jobs:
           DEBUG_KEYSTORE_B64: ${{ secrets.DEBUG_KEYSTORE_B64 }}
         run: |
           if [ -n "$DEBUG_KEYSTORE_B64" ]; then
-            mkdir -p ~/.android
-            printf '%s' "$DEBUG_KEYSTORE_B64" | base64 -d > ~/.android/debug.keystore
+            printf '%s' "$DEBUG_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/fg.keystore"
+            echo "FG_KEYSTORE=$RUNNER_TEMP/fg.keystore" >> "$GITHUB_ENV"
           fi
       - name: Build debug APK
         run: gradle assembleDebug --no-daemon --stacktrace
 
+      - name: Check the APK is signed with the project key
+        # Never publish an APK that can't update the one already on the phones.
+        if: env.FG_KEYSTORE != ''
+        run: |
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          DIGEST=$("$APKSIGNER" verify --print-certs app/build/outputs/apk/debug/app-debug.apk | grep 'SHA-256 digest' | head -1 | awk '{print $NF}')
+          echo "signing key: $DIGEST"
+          case "$DIGEST" in
+            5a25ec6ecf580ac2*) echo "signature OK" ;;
+            *) echo "::error::APK signed with the wrong key ($DIGEST)"; exit 1 ;;
+          esac
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:

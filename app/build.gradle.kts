@@ -16,13 +16,30 @@ android {
         // install over an existing copy and you end up testing the old build.
         // versionName is what the About screen prints — keep it in step so the
         // installed version is verifiable at a glance.
-        versionCode = 33
-        versionName = "5.4"
+        versionCode = 34
+        versionName = "5.5"
+    }
+
+    // One fixed signing key for every build. CI points FG_KEYSTORE at the key
+    // from the DEBUG_KEYSTORE_B64 secret; without it each CI run signed with a
+    // fresh random key and Android refused to update in place. Local builds
+    // fall back to the default debug key, which is the same key.
+    signingConfigs {
+        getByName("debug") {
+            val ks = System.getenv("FG_KEYSTORE")
+            if (!ks.isNullOrBlank() && file(ks).exists()) {
+                storeFile = file(ks)
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
     }
 
     buildTypes {
         debug {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
         }
         release {
             isMinifyEnabled = false
