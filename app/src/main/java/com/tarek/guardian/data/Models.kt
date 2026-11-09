@@ -120,6 +120,8 @@ data class Policy(
      * SafeSearch and YouTube Restricted Mode are enforced at the DNS level.
      */
     var filterWeb: Boolean = false,
+    /** Allow another VPN app (e.g. Proton) on the child phone without tamper alerts. */
+    var allowExternalVpn: Boolean = false,
 
     // ---- Extra time & rewards --------------------------------------------------
     /** Extra minutes granted for [bonusDate] (yyyyMMdd) only — resets by itself. */

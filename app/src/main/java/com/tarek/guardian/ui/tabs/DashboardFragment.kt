@@ -215,7 +215,7 @@ class DashboardFragment : TabBase() {
         // child's actual protection state.
         val ctx2 = context
         b.tvAdminStatus.text = L10n.s(if (s.adminActive) R.string.dash_admin_ok else R.string.dash_admin_bad)
-        b.tvVpnStatus.text = L10n.s(if (s.vpnReady) R.string.dash_vpn_ok else R.string.dash_vpn_bad)
+        b.tvVpnStatus.text = L10n.s(if (s.externalVpn) R.string.dash_vpn_external else if (s.vpnReady) R.string.dash_vpn_ok else R.string.dash_vpn_bad)
         // App blocking, whole-device lock, time limits and schedules all run
         // through the Accessibility Service — a separate OS grant from Device
         // Admin/VPN above. Some phones (Huawei especially) silently turn this
@@ -223,7 +223,7 @@ class DashboardFragment : TabBase() {
         b.tvAccessibilityStatus.text = L10n.s(if (s.accessibilityActive) R.string.dash_acc_ok else R.string.dash_acc_bad)
         if (ctx2 != null) {
             b.tvAdminStatus.setTextColor(ctx2.getColor(if (s.adminActive) R.color.secondary_dark else R.color.error))
-            b.tvVpnStatus.setTextColor(ctx2.getColor(if (s.vpnReady) R.color.secondary_dark else R.color.error))
+            b.tvVpnStatus.setTextColor(ctx2.getColor(if (s.vpnReady || s.externalVpn) R.color.secondary_dark else R.color.error))
             b.tvAccessibilityStatus.setTextColor(ctx2.getColor(if (s.accessibilityActive) R.color.secondary_dark else R.color.error))
         }
 

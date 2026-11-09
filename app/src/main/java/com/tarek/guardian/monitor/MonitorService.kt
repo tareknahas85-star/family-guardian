@@ -154,17 +154,21 @@ class MonitorService : Service() {
 
         val batt = DeviceInfo.battery(this)
         val adminOk = policyMgr.isAdminActive
+        FilterVpnService.allowExternalVpn = policy.allowExternalVpn
+        val externalVpn = policy.allowExternalVpn && com.tarek.guardian.vpn.VpnState.otherVpnActive(this)
         val vpnOk = VpnService.prepare(this) == null
         val accOk = AppBlockService.isEnabled(this)
-        checkTamper(adminOk, vpnOk, accOk)
+        // An allowed external VPN is not tampering; our own VPN just waits.
+        checkTamper(adminOk, vpnOk || externalVpn, accOk)
         // LOCK_NOW and BLOCK_INTERNET are no-ops without these two one-time OS
         // grants — report the real state every cycle so the parent can see it
         // instead of a command silently doing nothing (see handleCommand()).
         FirebaseRepo.setChildInfo(
             code, "${Build.MANUFACTURER} ${Build.MODEL}", batt.percent, batt.charging,
             adminActive = adminOk,
-            vpnReady = vpnOk,
-            accessibilityActive = accOk
+            vpnReady = vpnOk && !externalVpn,
+            accessibilityActive = accOk,
+            externalVpn = externalVpn
         )
 
         // The installed list barely changes; once an hour is plenty and keeps the

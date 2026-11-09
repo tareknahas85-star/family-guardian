@@ -41,6 +41,8 @@ object GuardianState {
          */
         val adminActive: Boolean = false,
         val vpnReady: Boolean = false,
+        /** Another VPN app (allowed by the parent) currently holds the VPN slot. */
+        val externalVpn: Boolean = false,
         /**
          * Real, child-reported state of the Accessibility Service permission —
          * a completely separate OS grant from Device Admin/VPN, and the ONLY

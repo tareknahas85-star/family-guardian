@@ -98,6 +98,7 @@ class SettingsTabFragment : TabBase() {
         }
         b.swCamera.onChange { on -> host?.savePolicy { it.cameraDisabled = on } }
         b.swFilterWeb.onChange { on -> host?.savePolicy { it.filterWeb = on } }
+        b.swExternalVpn.onChange { on -> host?.savePolicy { it.allowExternalVpn = on } }
 
         // ── Rewards ──
         b.btnAddTask.setOnClickListener { addTask() }
@@ -175,6 +176,7 @@ class SettingsTabFragment : TabBase() {
         b.swLockAtLimit.isChecked = s.policy.lockWhenLimitReached
         b.swCamera.isChecked      = s.policy.cameraDisabled
         b.swFilterWeb.isChecked   = s.policy.filterWeb
+        b.swExternalVpn.isChecked = s.policy.allowExternalVpn
 
         val limit = s.policy.dailyLimitMinutes.coerceIn(0, 480)
         b.sliderLimit.value = limit.toFloat()

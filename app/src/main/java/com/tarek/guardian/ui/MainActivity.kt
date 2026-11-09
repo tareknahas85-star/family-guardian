@@ -206,12 +206,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            FirebaseRepo.listenChildInfo(code) { model, lastSeen, _, battery, charging, adminActive, vpnReady, accessibilityActive ->
+            FirebaseRepo.listenChildInfo(code) { model, lastSeen, _, battery, charging, adminActive, vpnReady, accessibilityActive, externalVpn ->
                 GuardianState.update {
                     it.copy(
                         model = model, lastSeen = lastSeen,
                         battery = battery, charging = charging,
-                        adminActive = adminActive, vpnReady = vpnReady,
+                        adminActive = adminActive, vpnReady = vpnReady, externalVpn = externalVpn,
                         accessibilityActive = accessibilityActive, error = null
                     )
                 }

@@ -118,6 +118,7 @@ class FilterVpnService : VpnService() {
             }
 
             activeMode = mode
+            up = true
             blockedSince = if (mode == MODE_BLOCK) System.currentTimeMillis() else 0L
             running = true
             val gen = ++generation
@@ -242,6 +243,7 @@ class FilterVpnService : VpnService() {
         running = false
         blockedSince = 0L
         activeMode = MODE_OFF
+        up = false
         try { tun?.close() } catch (_: Exception) {}
         tun = null
         reader?.interrupt()
@@ -265,7 +267,15 @@ class FilterVpnService : VpnService() {
         // The user turned the VPN off from Android settings. Respect it — this is
         // also the manual escape hatch if the app ever gets stuck again.
         Log.w(TAG, "VPN revoked by user")
-        com.tarek.guardian.alerts.TamperReporter.report(this, R.string.tamper_vpn)
+        // Another VPN (e.g. Proton) taking over also lands here. Give it a moment
+        // to show up, then only alert if it was not an allowed external VPN.
+        val appCtx = applicationContext
+        thread(name = "vpn-revoke-check") {
+            try { Thread.sleep(3000) } catch (_: InterruptedException) {}
+            if (!(allowExternalVpn && VpnState.otherVpnActive(appCtx))) {
+                com.tarek.guardian.alerts.TamperReporter.report(appCtx, R.string.tamper_vpn)
+            }
+        }
         desiredMode = MODE_OFF
         internetBlocked = false
         stopTunnel()
@@ -323,6 +333,12 @@ class FilterVpnService : VpnService() {
          */
         const val MAX_BLOCK_MS = 6 * 60 * 60 * 1000L
 
+        /** True while our own tunnel is established. */
+        @Volatile var up: Boolean = false
+
+        /** Parent allows another VPN app (set from the policy by MonitorService). */
+        @Volatile var allowExternalVpn: Boolean = false
+
         @Volatile private var desiredMode: Int = MODE_OFF
         @Volatile var internetBlocked: Boolean = false
         @Volatile var blockedDomains: HashSet<String> = HashSet()
@@ -362,6 +378,12 @@ class FilterVpnService : VpnService() {
         }
 
         private fun send(ctx: Context, action: String, fg: Boolean) {
+            // Another VPN holds the slot and the parent allowed it: starting ours
+            // would just fail (Android revoked our consent), so wait it out.
+            if (action != ACTION_STOP && allowExternalVpn && VpnState.otherVpnActive(ctx)) {
+                Log.d(TAG, "external VPN active — $action deferred")
+                return
+            }
             val i = Intent(ctx, FilterVpnService::class.java).setAction(action)
             try {
                 if (fg && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ctx.startForegroundService(i)

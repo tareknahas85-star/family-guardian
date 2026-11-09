@@ -400,6 +400,9 @@
     <string name="no_tasks_parent">No tasks yet.</string>
 
     <!-- Safe browsing -->
+    <string name="dash_vpn_external">ℹ Another VPN is running (allowed) — internet cut-off and safe browsing are paused</string>
+    <string name="allow_external_vpn">Allow another VPN app</string>
+    <string name="allow_external_vpn_hint">For apps that need a VPN (like Proton). No tamper alert while it runs, but internet cut-off and safe browsing pause until it is turned off, then the child must open the app and tap Start the internet filter once.</string>
     <string name="safe_browsing">Safe browsing</string>
     <string name="safe_browsing_hint">Blocks adult and gambling sites, forces SafeSearch on Google and Bing and Restricted Mode on YouTube. Uses the free CleanBrowsing family filter.</string>
 

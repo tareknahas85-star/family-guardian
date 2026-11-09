@@ -470,6 +470,9 @@
     <string name="no_tasks_parent">لسا ما في مهمات.</string>
 
     <!-- Safe browsing -->
+    <string name="dash_vpn_external">ℹ في VPN ثاني شغّال (مسموح) — قطع النت والتصفح الآمن واقفين مؤقتاً</string>
+    <string name="allow_external_vpn">اسمح ببرنامج VPN ثاني</string>
+    <string name="allow_external_vpn_hint">للتطبيقات اللي بدها VPN (متل Proton). ما بيطلعلك تنبيه تلاعب وهو شغّال، بس قطع النت والتصفح الآمن بيوقفوا لحد ما ينطفي. بعدها لازم الولد يفتح البرنامج ويكبس تشغيل فلتر النت مرة وحدة.</string>
     <string name="safe_browsing">التصفح الآمن</string>
     <string name="safe_browsing_hint">بيحجب مواقع الكبار والقمار، وبيفرض البحث الآمن على Google وBing والوضع المقيّد على YouTube. بيستعمل فلتر العيلة المجاني من CleanBrowsing.</string>
 

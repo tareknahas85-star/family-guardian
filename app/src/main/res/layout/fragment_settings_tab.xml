@@ -104,6 +104,13 @@
                     android:text="@string/safe_browsing_hint" android:paddingBottom="6dp"
                     android:textSize="12sp" android:textColor="@color/on_surface_variant" />
                 <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/swExternalVpn" style="@style/Switch.Guardian"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="@string/allow_external_vpn" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="@string/allow_external_vpn_hint" android:paddingBottom="6dp"
+                    android:textSize="12sp" android:textColor="@color/on_surface_variant" />
+                <com.google.android.material.materialswitch.MaterialSwitch
                     android:id="@+id/swCamera" style="@style/Switch.Guardian"
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:text="@string/disable_camera" />
