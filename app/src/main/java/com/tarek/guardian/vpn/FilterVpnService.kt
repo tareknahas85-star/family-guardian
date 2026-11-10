@@ -354,6 +354,7 @@ class FilterVpnService : VpnService() {
 
         /** Turn the internet off. */
         fun block(ctx: Context) {
+            if (deferred(ctx)) return
             desiredMode = MODE_BLOCK
             internetBlocked = true
             send(ctx, ACTION_START, fg = true)
@@ -361,7 +362,8 @@ class FilterVpnService : VpnService() {
 
         /** Internet on, through the family DNS filter. No-op if already filtering. */
         fun filter(ctx: Context) {
-            if (desiredMode == MODE_FILTER) return
+            if (deferred(ctx)) return
+            if (desiredMode == MODE_FILTER && up) return
             desiredMode = MODE_FILTER
             internetBlocked = false
             send(ctx, ACTION_FILTER, fg = true)
@@ -377,13 +379,18 @@ class FilterVpnService : VpnService() {
             send(ctx, ACTION_STOP, fg = false)
         }
 
+        /**
+         * Another VPN holds the slot and the parent allowed it. Starting ours
+         * would disconnect it, so wait; MonitorService retries every minute and
+         * the tunnel comes back by itself once the other VPN is off.
+         */
+        private fun deferred(ctx: Context): Boolean {
+            if (!(allowExternalVpn && VpnState.otherVpnActive(ctx))) return false
+            Log.d(TAG, "external VPN active — waiting")
+            return true
+        }
+
         private fun send(ctx: Context, action: String, fg: Boolean) {
-            // Another VPN holds the slot and the parent allowed it: starting ours
-            // would just fail (Android revoked our consent), so wait it out.
-            if (action != ACTION_STOP && allowExternalVpn && VpnState.otherVpnActive(ctx)) {
-                Log.d(TAG, "external VPN active — $action deferred")
-                return
-            }
             val i = Intent(ctx, FilterVpnService::class.java).setAction(action)
             try {
                 if (fg && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ctx.startForegroundService(i)

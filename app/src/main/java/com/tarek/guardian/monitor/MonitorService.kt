@@ -156,7 +156,12 @@ class MonitorService : Service() {
         val adminOk = policyMgr.isAdminActive
         FilterVpnService.allowExternalVpn = policy.allowExternalVpn
         val externalVpn = policy.allowExternalVpn && com.tarek.guardian.vpn.VpnState.otherVpnActive(this)
-        val vpnOk = VpnService.prepare(this) == null
+        // VpnService.prepare() is NOT a harmless status check: for an app that
+        // already has VPN consent it re-claims the VPN slot and disconnects
+        // whichever VPN is running. So never call it while an allowed external
+        // VPN is up — keep the last known answer instead.
+        val vpnOk = if (externalVpn) getSharedPreferences("tamper", MODE_PRIVATE).getBoolean("vpn", false)
+                    else VpnService.prepare(this) == null
         val accOk = AppBlockService.isEnabled(this)
         // An allowed external VPN is not tampering; our own VPN just waits.
         checkTamper(adminOk, vpnOk || externalVpn, accOk)
@@ -362,6 +367,7 @@ class MonitorService : Service() {
         p.blockedApps.forEach { policyMgr.setAppHidden(it, true) }
 
         FilterVpnService.blockedDomains = HashSet(p.blockedDomains)
+        FilterVpnService.allowExternalVpn = p.allowExternalVpn
         if (p.internetBlocked) {
             FilterVpnService.confirmStillBlocked()
             FilterVpnService.block(this)
@@ -401,7 +407,9 @@ class MonitorService : Service() {
             }
             "UNLOCK" -> FirebaseRepo.updatePolicy(code, mapOf("locked" to false))
             "BLOCK_INTERNET" -> {
-                if (VpnService.prepare(this) != null) {
+                val extVpn = policy.allowExternalVpn && com.tarek.guardian.vpn.VpnState.otherVpnActive(this)
+                // prepare() would kick the other VPN out — see cycle().
+                if (!extVpn && VpnService.prepare(this) != null) {
                     reportSetupNeeded(
                         L10n.s(R.string.cant_net_title),
                         L10n.s(R.string.cant_net_body)

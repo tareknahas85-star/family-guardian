@@ -150,8 +150,11 @@ class ChildSetupActivity : AppCompatActivity() {
         b.tvAdminStatus.text = getString(if (adminOk) R.string.child_admin_ok else R.string.child_admin_bad)
         b.tvAdminStatus.setTextColor(getColor(if (adminOk) R.color.secondary_dark else R.color.error))
 
-        val vpnOk = VpnService.prepare(this) == null
-        b.tvVpnStatus.text = getString(if (vpnOk) R.string.child_vpn_ok else R.string.child_vpn_bad)
+        // prepare() would disconnect an allowed external VPN (e.g. Proton) just
+        // by opening this screen, so skip the check while one is running.
+        val extVpn = FilterVpnService.allowExternalVpn && com.tarek.guardian.vpn.VpnState.otherVpnActive(this)
+        val vpnOk = extVpn || VpnService.prepare(this) == null
+        b.tvVpnStatus.text = getString(if (extVpn) R.string.dash_vpn_external else if (vpnOk) R.string.child_vpn_ok else R.string.child_vpn_bad)
         b.tvVpnStatus.setTextColor(getColor(if (vpnOk) R.color.secondary_dark else R.color.error))
 
         // Checked directly against Settings.Secure (see AppBlockService.isEnabled),
