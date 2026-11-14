@@ -110,6 +110,28 @@
                 <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:text="@string/allow_external_vpn_hint" android:paddingBottom="6dp"
                     android:textSize="12sp" android:textColor="@color/on_surface_variant" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="@string/lock_calls" android:paddingTop="10dp"
+                    android:textSize="15sp" android:textColor="@color/on_surface" />
+                <RadioGroup android:id="@+id/rgLockCalls"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <RadioButton android:id="@+id/rbLockCallsOff"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:minHeight="48dp" android:textSize="15sp"
+                        android:textColor="@color/on_surface" android:text="@string/lock_calls_off" />
+                    <RadioButton android:id="@+id/rbLockCallsTrusted"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:minHeight="48dp" android:textSize="15sp"
+                        android:textColor="@color/on_surface" android:text="@string/lock_calls_trusted" />
+                    <RadioButton android:id="@+id/rbLockCallsAll"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:minHeight="48dp" android:textSize="15sp"
+                        android:textColor="@color/on_surface" android:text="@string/lock_calls_all" />
+                </RadioGroup>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="@string/lock_calls_hint" android:paddingBottom="6dp"
+                    android:textSize="12sp" android:textColor="@color/on_surface_variant" />
                 <com.google.android.material.materialswitch.MaterialSwitch
                     android:id="@+id/swCamera" style="@style/Switch.Guardian"
                     android:layout_width="match_parent" android:layout_height="wrap_content"

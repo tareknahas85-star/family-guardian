@@ -200,7 +200,8 @@ class ChildSetupActivity : AppCompatActivity() {
             android.Manifest.permission.ACCESS_FINE_LOCATION,
             android.Manifest.permission.READ_CALL_LOG,
             android.Manifest.permission.READ_CONTACTS,
-            android.Manifest.permission.READ_PHONE_STATE
+            android.Manifest.permission.READ_PHONE_STATE,
+            android.Manifest.permission.CALL_PHONE
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             perms.add(android.Manifest.permission.POST_NOTIFICATIONS)

@@ -362,8 +362,15 @@ class MonitorService : Service() {
 
     private fun applyPolicy(p: Policy) {
         val set = HashSet<String>(p.blockedApps)
-        if (p.locked) { set.add("*"); policyMgr.lockNow() }
+        AppBlockService.lockCalls = p.lockCalls
+        AppBlockService.sosOnLock = p.sosEnabled
+        if (p.locked) set.add("*")
         AppBlockService.blockedPackages = set
+        if (p.locked) {
+            // Lock screen first, so it is what shows when the phone is woken.
+            AppBlockService.showLockScreen(this)
+            policyMgr.lockNow()
+        }
         p.blockedApps.forEach { policyMgr.setAppHidden(it, true) }
 
         FilterVpnService.blockedDomains = HashSet(p.blockedDomains)

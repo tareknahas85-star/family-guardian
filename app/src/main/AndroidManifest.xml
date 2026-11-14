@@ -32,6 +32,8 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <!-- Needed by CallScreeningService to see the caller's number -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
@@ -82,6 +84,12 @@
             android:name=".ui.ChildSetupActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.LockScreenActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.tarek.guardian.lock" />
         <activity
             android:name=".voice.VoiceCommandActivity"
             android:exported="false"

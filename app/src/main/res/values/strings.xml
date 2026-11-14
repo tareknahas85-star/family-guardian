@@ -403,6 +403,16 @@
     <string name="dash_vpn_external">ℹ Another VPN is running (allowed) — internet cut-off and safe browsing are paused</string>
     <string name="allow_external_vpn">Allow another VPN app</string>
     <string name="allow_external_vpn_hint">For apps that need a VPN (like Proton). While it runs there is no tamper alert, and internet cut-off and safe browsing pause. They come back by themselves within a minute after it is turned off.</string>
+    <string name="lock_calls">Calls while the phone is locked</string>
+    <string name="lock_calls_off">Not allowed</string>
+    <string name="lock_calls_trusted">Trusted numbers only (buttons on the lock screen)</string>
+    <string name="lock_calls_all">All calls (the phone app stays open)</string>
+    <string name="lock_calls_hint">Trusted numbers are the priority and allowed numbers in Call filtering. Incoming calls can always be answered, and call filtering still applies.</string>
+    <string name="lock_title">This phone is locked</string>
+    <string name="lock_subtitle">You can still call:</string>
+    <string name="lock_no_numbers">No numbers have been added yet</string>
+    <string name="lock_open_phone">Open the phone app</string>
+    <string name="lock_call_perm">Allow the Phone permission to call from here</string>
     <string name="safe_browsing">Safe browsing</string>
     <string name="safe_browsing_hint">Blocks adult and gambling sites, forces SafeSearch on Google and Bing and Restricted Mode on YouTube. Uses the free CleanBrowsing family filter.</string>
 

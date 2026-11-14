@@ -5,6 +5,11 @@ import com.tarek.guardian.L10n
 import android.accessibilityservice.AccessibilityService
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.media.AudioManager
+import android.telecom.TelecomManager
+import com.tarek.guardian.data.LockCalls
+import com.tarek.guardian.ui.LockScreenActivity
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
@@ -59,6 +64,7 @@ class AppBlockService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        instance = this
         handler.removeCallbacks(poll)
         handler.post(poll)
     }
@@ -94,7 +100,25 @@ class AppBlockService : AccessibilityService() {
         val changed = pkg != lastSeenPkg
 
         val blocked = blockedPackages
-        val isBlocked = blocked.contains("*") || blocked.contains(pkg)
+        val whole = blocked.contains("*")
+
+        // Whole-device lock: a call in progress (or the phone app, when the
+        // parent allows all calls) stays usable.
+        if (whole && callUiAllowed(pkg)) {
+            lastSeenPkg = pkg
+            lastForegroundPkg = pkg
+            return
+        }
+        // With calls allowed, our own lock screen (the call buttons) takes the
+        // place of the launcher, so there is something to call from.
+        if (whole && lockCalls != LockCalls.OFF && isLauncher(pkg)) {
+            showLockScreen(this)
+            lastSeenPkg = pkg
+            lastForegroundPkg = pkg
+            return
+        }
+
+        val isBlocked = whole || blocked.contains(pkg)
 
         if (isBlocked && !isSystemUi(pkg)) {
             performGlobalAction(GLOBAL_ACTION_HOME)
@@ -108,7 +132,10 @@ class AppBlockService : AccessibilityService() {
             // foreground, means the screen re-locks almost immediately even on
             // a device/launcher combination where the Home action alone quietly
             // does nothing.
-            if (blocked.contains("*")) policyMgr.lockNow()
+            if (whole) {
+                showLockScreen(this)
+                policyMgr.lockNow()
+            }
             if (changed) {
                 Toast.makeText(this, L10n.s(R.string.blocked_by_parent), Toast.LENGTH_SHORT).show()
                 EventReporter.recordApp(
@@ -132,9 +159,51 @@ class AppBlockService : AccessibilityService() {
     private fun isSystemUi(pkg: String): Boolean =
         pkg.contains("launcher") || pkg == "com.android.systemui" || pkg.contains("systemui")
 
+    private val homePkg: String? by lazy {
+        try {
+            packageManager.resolveActivity(
+                Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME), 0
+            )?.activityInfo?.packageName
+        } catch (_: Exception) { null }
+    }
+
+    private fun isLauncher(pkg: String): Boolean = pkg.contains("launcher") || pkg == homePkg
+
+    private val defaultDialer: String? by lazy {
+        try { getSystemService(TelecomManager::class.java)?.defaultDialerPackage } catch (_: Exception) { null }
+    }
+
+    /** The dialer / in-call screen, whatever this phone calls it. */
+    private fun isPhonePkg(pkg: String): Boolean =
+        pkg == defaultDialer || pkg.contains("incallui") || pkg.contains("dialer") ||
+            (lockCalls == LockCalls.ALL && pkg.contains("contacts"))
+
+    @android.annotation.SuppressLint("MissingPermission")
+    private fun inCall(): Boolean {
+        try {
+            if (getSystemService(TelecomManager::class.java)?.isInCall == true) return true
+        } catch (_: Exception) {
+        }
+        return try {
+            val m = (getSystemService(AUDIO_SERVICE) as AudioManager).mode
+            m == AudioManager.MODE_RINGTONE || m == AudioManager.MODE_IN_CALL
+        } catch (_: Exception) { false }
+    }
+
+    /** May this package stay in front while the whole device is locked? */
+    private fun callUiAllowed(pkg: String): Boolean {
+        // The system side of telephony, including the emergency dialer.
+        if (pkg == "com.android.phone" || pkg == "com.android.server.telecom") return true
+        val inGrace = System.currentTimeMillis() < graceUntil
+        if (inGrace && (pkg.contains("permissioncontroller") || pkg.contains("packageinstaller"))) return true
+        if (!isPhonePkg(pkg)) return false
+        return lockCalls == LockCalls.ALL || inGrace || inCall()
+    }
+
     override fun onInterrupt() {}
 
     override fun onDestroy() {
+        if (instance === this) instance = null
         handler.removeCallbacks(poll)
         super.onDestroy()
     }
@@ -151,6 +220,30 @@ class AppBlockService : AccessibilityService() {
          */
         @Volatile
         var lastForegroundPkg: String? = null
+
+        /** [LockCalls] mode from the current Policy. */
+        @Volatile var lockCalls: String = LockCalls.TRUSTED
+        /** Show the SOS button on the lock screen. */
+        @Volatile var sosOnLock: Boolean = true
+        @Volatile private var graceUntil: Long = 0L
+        @Volatile private var instance: AppBlockService? = null
+
+        /** Briefly lets the call screen / permission dialog through, right after a tap on the lock screen. */
+        fun grace(ms: Long) { graceUntil = System.currentTimeMillis() + ms }
+
+        fun deviceLocked(): Boolean = blockedPackages.contains("*")
+
+        /** Brings the lock screen with the call buttons to the front. No-op when calls are off. */
+        fun showLockScreen(ctx: Context) {
+            if (lockCalls == LockCalls.OFF) return
+            val c: Context = instance ?: ctx
+            try {
+                c.startActivity(
+                    Intent(c, LockScreenActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+            } catch (_: Exception) {
+            }
+        }
 
         /** Frequent enough to close the recents-switch gap without being wasteful. */
         private const val POLL_MS = 700L

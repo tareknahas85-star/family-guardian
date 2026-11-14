@@ -99,6 +99,15 @@ class SettingsTabFragment : TabBase() {
         b.swCamera.onChange { on -> host?.savePolicy { it.cameraDisabled = on } }
         b.swFilterWeb.onChange { on -> host?.savePolicy { it.filterWeb = on } }
         b.swExternalVpn.onChange { on -> host?.savePolicy { it.allowExternalVpn = on } }
+        b.rgLockCalls.setOnCheckedChangeListener { _, id ->
+            if (binding) return@setOnCheckedChangeListener
+            val mode = when (id) {
+                R.id.rbLockCallsOff -> com.tarek.guardian.data.LockCalls.OFF
+                R.id.rbLockCallsAll -> com.tarek.guardian.data.LockCalls.ALL
+                else                -> com.tarek.guardian.data.LockCalls.TRUSTED
+            }
+            host?.savePolicy { it.lockCalls = mode }
+        }
 
         // ── Rewards ──
         b.btnAddTask.setOnClickListener { addTask() }
@@ -177,6 +186,11 @@ class SettingsTabFragment : TabBase() {
         b.swCamera.isChecked      = s.policy.cameraDisabled
         b.swFilterWeb.isChecked   = s.policy.filterWeb
         b.swExternalVpn.isChecked = s.policy.allowExternalVpn
+        when (s.policy.lockCalls) {
+            com.tarek.guardian.data.LockCalls.OFF -> b.rbLockCallsOff.isChecked = true
+            com.tarek.guardian.data.LockCalls.ALL -> b.rbLockCallsAll.isChecked = true
+            else                                  -> b.rbLockCallsTrusted.isChecked = true
+        }
 
         val limit = s.policy.dailyLimitMinutes.coerceIn(0, 480)
         b.sliderLimit.value = limit.toFloat()

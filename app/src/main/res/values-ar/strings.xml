@@ -473,6 +473,16 @@
     <string name="dash_vpn_external">ℹ في VPN ثاني شغّال (مسموح) — قطع النت والتصفح الآمن واقفين مؤقتاً</string>
     <string name="allow_external_vpn">اسمح ببرنامج VPN ثاني</string>
     <string name="allow_external_vpn_hint">للتطبيقات اللي بدها VPN (متل Proton). وهو شغّال ما بيطلعلك تنبيه تلاعب، وقطع النت والتصفح الآمن بيوقفوا مؤقتاً. بيرجعوا لحالهن خلال دقيقة بعد ما ينطفي.</string>
+    <string name="lock_calls">الاتصال وقت القفل</string>
+    <string name="lock_calls_off">ممنوع</string>
+    <string name="lock_calls_trusted">الأرقام الموثوقة بس (أزرار على شاشة القفل)</string>
+    <string name="lock_calls_all">كل الاتصالات (تطبيق الهاتف بيضل مفتوح)</string>
+    <string name="lock_calls_hint">الأرقام الموثوقة هي أرقام الأولوية والأرقام المسموحة بقسم فلترة المكالمات. المكالمات الواردة بينرد عليها دايماً، وفلترة المكالمات بتضل شغّالة.</string>
+    <string name="lock_title">الموبايل مقفول</string>
+    <string name="lock_subtitle">لسا فيك تتصل بـ:</string>
+    <string name="lock_no_numbers">لسا ما انضاف ولا رقم</string>
+    <string name="lock_open_phone">افتح تطبيق الهاتف</string>
+    <string name="lock_call_perm">اسمح بإذن الهاتف لتقدر تتصل من هون</string>
     <string name="safe_browsing">التصفح الآمن</string>
     <string name="safe_browsing_hint">بيحجب مواقع الكبار والقمار، وبيفرض البحث الآمن على Google وBing والوضع المقيّد على YouTube. بيستعمل فلتر العيلة المجاني من CleanBrowsing.</string>
 

@@ -120,6 +120,8 @@ data class Policy(
      * SafeSearch and YouTube Restricted Mode are enforced at the DNS level.
      */
     var filterWeb: Boolean = false,
+    /** One of [LockCalls]: what calling is possible while the whole device is locked. */
+    var lockCalls: String = LockCalls.TRUSTED,
     /** Allow another VPN app (e.g. Proton) on the child phone without tamper alerts. */
     var allowExternalVpn: Boolean = false,
 
@@ -170,6 +172,16 @@ data class LocPoint(
 )
 
 /** How incoming (and optionally outgoing) calls are filtered. */
+/** Calling while the whole device is locked. Call filtering applies on top, unchanged. */
+object LockCalls {
+    /** Nothing can be dialled. Incoming calls can still be answered. */
+    const val OFF = "OFF"
+    /** Lock screen shows one call button per priority / allowed number. */
+    const val TRUSTED = "TRUSTED"
+    /** As TRUSTED, plus the phone app itself stays usable. */
+    const val ALL = "ALL"
+}
+
 object CallMode {
     /** No filtering at all. */
     const val OFF = "OFF"

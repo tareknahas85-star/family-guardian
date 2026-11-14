@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:fillViewport="true" android:background="?android:attr/colorBackground">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:gravity="center_horizontal"
+        android:padding="24dp">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="32dp" android:text="🔒" android:textSize="56sp" />
+        <TextView android:id="@+id/tvLockTitle" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_marginTop="12dp"
+            android:textSize="24sp" android:textStyle="bold"
+            android:textColor="@color/on_surface" android:text="@string/lock_title" />
+        <TextView android:id="@+id/tvLockSub" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp" android:textSize="15sp"
+            android:textColor="@color/on_surface_variant" android:text="@string/lock_subtitle" />
+        <LinearLayout android:id="@+id/lockNumbersHost" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical" />
+        <TextView android:id="@+id/tvLockEmpty" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_marginTop="8dp"
+            android:textSize="14sp" android:textColor="@color/on_surface_variant"
+            android:text="@string/lock_no_numbers" android:visibility="gone" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLockOpenPhone" style="@style/Button.Outline"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" android:text="@string/lock_open_phone"
+            android:visibility="gone" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLockSos" style="@style/Button.Danger"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="28dp" android:text="@string/sos_button" />
+    </LinearLayout>
+</ScrollView>
